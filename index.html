@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Profit In Peace — Webby World</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Lato:wght@400;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@
   /* proximity panels (non-blocking, auto-close on walk-away) */
   .panel{position:absolute;left:50%;bottom:110px;transform:translateX(-50%) translateY(16px);width:min(390px,90vw);background:var(--paper);color:#241E10;border-radius:16px;padding:20px 22px;opacity:0;pointer-events:none;transition:all .32s cubic-bezier(.3,1.35,.55,1);box-shadow:0 20px 60px rgba(0,0,0,.55)}
   .panel.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-  #game.mobile .panel{bottom:auto;top:calc(54px + env(safe-area-inset-top,0px));transform:translateX(-50%) translateY(-12px);width:min(340px,92vw);max-height:46vh;overflow-y:auto;padding:14px 16px;z-index:14}
+  #game.mobile .panel{bottom:auto;top:calc(64px + env(safe-area-inset-top,0px));transform:translateX(-50%) translateY(-12px);width:min(340px,92vw);max-height:46vh;overflow-y:auto;padding:14px 16px;z-index:14}
   #game.mobile .panel.show{transform:translateX(-50%) translateY(0)}
   #game.mobile .panel h3{font-size:17px}
   #game.mobile .panel p{font-size:12.5px}
@@ -266,6 +266,9 @@
   /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
+  #bigClose{display:none;position:fixed;right:14px;bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:33;width:58px;height:58px;border-radius:50%;background:var(--gold);color:#241E10;font-size:26px;font-weight:800;align-items:center;justify-content:center;border:2px solid #B8871E;box-shadow:0 10px 28px rgba(0,0,0,.5)}
+  #bigClose.on{display:flex}
+  #bigClose:active{transform:scale(.92)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
   #game.mobile.entered #joyWrap{display:block}
@@ -293,8 +296,8 @@
   .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
   .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
   /* everything the player needs to SEE lives at the top on mobile */
-  #game.mobile #stageBar{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px));padding:10px 12px;gap:10px;
-    background:linear-gradient(0deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.94) 30%);transform:translateY(-140%)}
+  #game.mobile #stageBar{position:fixed;left:0;right:0;bottom:auto;top:calc(64px + env(safe-area-inset-top,0px));padding:10px 12px;gap:10px;
+    background:linear-gradient(0deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.94) 30%);transform:translateY(-160%)}
   #game.mobile #stageBar.show{transform:translateY(0)}
   #game.mobile #stageBar .sb-label{font-size:10.5px;letter-spacing:.14em}
   #game.mobile #stageBar button{font-size:11px;padding:8px 11px}
@@ -401,6 +404,7 @@
 
   <div id="joyWrap"><div id="joyBase"><span class="ja ja-u"></span><span class="ja ja-d"></span><span class="ja ja-l"></span><span class="ja ja-r"></span><div id="joyKnob"></div></div></div>
   <button id="mobMenuBtn">☰</button>
+  <button id="bigClose">✕</button>
 
   <div id="mobMenu">
     <div class="nav-head">
@@ -985,6 +989,12 @@ let puffs=[];
 let keys={},tapTarget=null;
 /* ---------- mobile + device-bonus state ---------- */
 let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null;
+const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','profileCard','hofCard','bonusPanel'];
+function updateBigClose(){
+  if(!IS_MOBILE)return;
+  const any=CLOSE_WATCH.some(id=>$(id).classList.contains('show'));
+  $('bigClose').classList.toggle('on',any);
+}
 let bonuses={entry:false,d1:false,d2:false};
 try{Object.assign(bonuses,JSON.parse(localStorage.getItem('ww_bonuses')||'{}'));}catch(e){}
 function saveBonuses(){try{localStorage.setItem('ww_bonuses',JSON.stringify(bonuses));}catch(e){}}
@@ -1621,7 +1631,7 @@ function startGame(name,skin,gender='m'){
   window.addEventListener('keyup',e=>{if(typing(e))return;keys[e.key.toLowerCase()]=false;});
   function handleTap(wx,wy,walkOk){
     if(transitioning||vidOpen)return;
-    if(IS_MOBILE&&ctxAction&&ctxAnchor&&dist(wx,wy,ctxAnchor.x,ctxAnchor.y)<46){ctxAction();return;}
+    if(IS_MOBILE&&ctxAction){ctxAction();return;}
     if(entered){
       const qbH=questCollapsed?QB.hMin:QB.hFull;
       if(wx>QB.x-10&&wx<QB.x+QB.w+10&&wy>QB.y-10&&wy<QB.y+qbH+14){
@@ -1686,6 +1696,7 @@ function startGame(name,skin,gender='m'){
     $('game').classList.add('mobile');
     questCollapsed=true;
     initMobileMenu();
+    $('bigClose').onclick=()=>{CLOSE_WATCH.forEach(id=>$(id).classList.remove('show'));blip(520,0.05,'sine',0.06);};
   }
   updateBonusChip();
   $('bonusChip').onclick=()=>{const p=$('bonusPanel');
@@ -1780,6 +1791,7 @@ function sizeTheater(){
 function loop(ts){const dt=Math.min(0.05,(ts-lastTs)/1000);lastTs=ts;elapsed+=dt;update(dt);render();if(vidOpen)updateVideo(dt);requestAnimationFrame(loop);}
 
 function update(dt){
+  updateBigClose();
   if(phase==='lobby'){countdownT-=dt;
     if(countdownT<=0)startWebinar();
     else{const m=Math.floor(countdownT/60),s=Math.floor(countdownT%60);$('countdown').textContent=`Starts in ${m}:${String(s).padStart(2,'0')}`;}}
