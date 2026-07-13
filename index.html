@@ -726,9 +726,7 @@ drawAvatarPreview();
     $(id).classList.add('sel');drawAvatarPreview();});
 });
 $('enterBtn').addEventListener('click',()=>{const name=$('nameInput').value.trim()||'You';startGame(name,SKINS[selSkin],selGender);});
-/* DESIGN BUILD: skip landing/opt-in/creator — boot straight into the world */
-const SKIP_LOGIN=true;
-if(SKIP_LOGIN)startGame('Explorer',SKINS[Math.floor(Math.random()*SKINS.length)],'m');
+
 
 /* ---------- portrait placeholder generator ---------- */
 function portraitURI(o){
@@ -2854,6 +2852,10 @@ function renderTheaterFrame(){
 }
 function rr(g,x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r);}
 function wrapOn(g,text,x,y,maxW,lh){g.textAlign='left';const words=text.split(' ');let line='',yy=y;words.forEach(w=>{const t=line?line+' '+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(line,x,yy);line=w;yy+=lh;}else line=t;});g.fillText(line,x,yy);}
+
+/* DESIGN BUILD: skip landing/opt-in/creator — boot straight into the world */
+const SKIP_LOGIN=true;
+if(SKIP_LOGIN)startGame('Explorer',SKINS[Math.floor(Math.random()*SKINS.length)],'m');
 </script>
 </body>
 </html>
