@@ -273,7 +273,7 @@
   #tapOpenBtn.on{display:block}
   #tapOpenBtn:active{transform:translateX(-50%) scale(.95)}
   @keyframes ctxPulse{0%,100%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.4)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
-  #tutCap{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%) scale(.94);z-index:16;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.07em;color:var(--gold);text-align:center;background:rgba(6,14,10,.92);border:2px solid rgba(249,200,94,.55);border-radius:16px;padding:16px 22px;box-shadow:0 14px 44px rgba(0,0,0,.6);opacity:0;transition:opacity .45s,transform .45s;pointer-events:none;max-width:84vw;line-height:1.4}
+  #tutCap{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.94);z-index:16;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.07em;color:var(--gold);text-align:center;background:rgba(6,14,10,.92);border:2px solid rgba(249,200,94,.55);border-radius:16px;padding:16px 22px;box-shadow:0 14px 44px rgba(0,0,0,.6);opacity:0;transition:opacity .45s,transform .45s;pointer-events:none;max-width:84vw;line-height:1.4}
   #tutCap.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
@@ -1625,12 +1625,15 @@ function drawMarkers(){
 }
 /* mobile: walking up arms the nearest marker (grows + TAP TO OPEN); tapping it opens.
    desktop: popups still open on walk-up. */
-let ctxAnchor=null;
-function proxOffer(label,fn){
+let ctxAnchor=null,ctxOwner=null;
+function proxOffer(label,fn,key){
   if(!IS_MOBILE){fn();return;}
-  ctxAction=fn;
+  ctxAction=fn;ctxOwner=key||null;
 }
-function proxClear(){ctxAction=null;ctxAnchor=null;}
+function proxClear(key){
+  if(key&&ctxOwner&&ctxOwner!==key)return;   // only the owner may disarm
+  ctxAction=null;ctxOwner=null;ctxAnchor=null;
+}
 function setNavMode(m){
   navMode=m;
   $('game').classList.toggle('menumode',m==='menu');
@@ -1763,7 +1766,7 @@ function startGameInputs(name){
   $('goBtn').onclick=()=>{renderNav();$('navSheet').classList.add('show');};
   $('navClose').onclick=()=>$('navSheet').classList.remove('show');
 
-  toast('👋 Welcome to Webby World, '+name);
+  if(!tut)toast('👋 Welcome to Webby World, '+name);
   lastTs=performance.now();requestAnimationFrame(loop);
 }
 
@@ -1926,8 +1929,11 @@ function update(dt){
   /* ---- hall of fame: auto open/close on proximity, never blocks movement ---- */
   if(entered){
     let hit=-1;PEDS.forEach((p,i)=>{if(dist(player.x,player.y,p.x,p.y+8)<74)hit=i;});
-    if(hit>=0&&hit!==curTrophy&&hit!==trophyOffer){trophyOffer=hit;proxOffer('🏆 VIEW THIS WIN',()=>openTrophy(hit));}
-    if(hit<0){trophyOffer=-1;if(curTrophy>=0){$('hofCard').classList.remove('show');curTrophy=-1;const hv=$('hofVid');if(hv.pause)hv.pause();}proxClear();}
+    if(hit>=0&&hit!==curTrophy&&hit!==trophyOffer){trophyOffer=hit;proxOffer('🏆 VIEW THIS WIN',()=>openTrophy(hit),'trophy');}
+    if(hit<0){
+      if(trophyOffer>=0){trophyOffer=-1;proxClear('trophy');}   // clear ONCE, on leaving — not every frame
+      if(curTrophy>=0){$('hofCard').classList.remove('show');curTrophy=-1;const hv=$('hofVid');if(hv.pause)hv.pause();}
+    }
   }
 
   /* ---- treasure chests ---- */
@@ -1936,7 +1942,7 @@ function update(dt){
     CHESTS.forEach((c,i)=>{if(dist(player.x,player.y,c.x,c.y)<46)hitC=i;});
     if(hitC!==nearChest){
       // leaving previous chest → close its panels + clear the tap prompt
-      if(nearChest>=0&&hitC<0)proxClear();
+      if(nearChest>=0&&hitC<0)proxClear('chest');
       $('resourcePanel').classList.remove('show');
       $('goldenPanel').classList.remove('show');
       $('mysteryPanel').classList.remove('show');
@@ -1959,7 +1965,7 @@ function update(dt){
               $('goldenPanel').classList.add('show');
             }
           }
-        });
+        },'chest');
       }
       if(hitC<0){chestLatch=-1;}
     }
@@ -1967,31 +1973,31 @@ function update(dt){
 
   /* ---- sorting hat / wall calendar / VIP closet ---- */
   const inHat=entered&&dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62);
-  if(inHat&&!nearHat){nearHat=true;proxOffer('🎩 TRY THE SORTING HAT',()=>{renderSort();$('sortPanel').classList.add('show');});}
-  if(!inHat&&nearHat){nearHat=false;$('sortPanel').classList.remove('show');proxClear();}
+  if(inHat&&!nearHat){nearHat=true;proxOffer('🎩 TRY THE SORTING HAT',()=>{renderSort();$('sortPanel').classList.add('show');},'hat');}
+  if(!inHat&&nearHat){nearHat=false;$('sortPanel').classList.remove('show');proxClear('hat');}
   const inCal=entered&&dist(player.x,player.y,CAL_OBJ.x,CAL_OBJ.y+14)<(IS_MOBILE?88:58)&&player.y>380;
-  if(inCal&&!nearCal){nearCal=true;proxOffer('📅 CHECK THE CALENDAR',()=>{calSeen=true;renderCalendar();$('calendarPanel').classList.add('show');});}
-  if(!inCal&&nearCal){nearCal=false;$('calendarPanel').classList.remove('show');proxClear();}
+  if(inCal&&!nearCal){nearCal=true;proxOffer('📅 CHECK THE CALENDAR',()=>{calSeen=true;renderCalendar();$('calendarPanel').classList.add('show');},'cal');}
+  if(!inCal&&nearCal){nearCal=false;$('calendarPanel').classList.remove('show');proxClear('cal');}
   const inLB=entered&&dist(player.x,player.y,LB_OBJ.x,LB_OBJ.y)<(IS_MOBILE?88:58);
-  if(inLB&&!nearLB){nearLB=true;proxOffer('🥇 VIEW HOUSE RANKINGS',()=>{lbSeen=true;renderLeader();$('leaderPanel').classList.add('show');});}
-  if(!inLB&&nearLB){nearLB=false;$('leaderPanel').classList.remove('show');proxClear();}
+  if(inLB&&!nearLB){nearLB=true;proxOffer('🥇 VIEW HOUSE RANKINGS',()=>{lbSeen=true;renderLeader();$('leaderPanel').classList.add('show');},'lb');}
+  if(!inLB&&nearLB){nearLB=false;$('leaderPanel').classList.remove('show');proxClear('lb');}
   const inGrand=entered&&vipUnlocked&&dist(player.x,player.y,GRANDC.x,GRANDC.y)<84;
   if(inGrand&&!nearGrand){nearGrand=true;proxOffer('✦ OPEN THE GRAND CHEST ✦',()=>{
     if(!grandOpen){grandOpen=true;burstConfetti(GRANDC.x,GRANDC.y-46,90);sfxChime();}
-    $('grandModal').classList.add('show');});}
-  if(!inGrand&&nearGrand){nearGrand=false;$('grandModal').classList.remove('show');proxClear();}
+    $('grandModal').classList.add('show');},'grand');}
+  if(!inGrand&&nearGrand){nearGrand=false;$('grandModal').classList.remove('show');proxClear('grand');}
   const inClo=entered&&vipUnlocked&&dist(player.x,player.y,CLOSET.x+CLOSET.w/2,CLOSET.y+CLOSET.h)<66;
-  if(inClo&&!nearCloset){nearCloset=true;proxOffer('👗 OPEN THE CLOSET',()=>{renderCloset();$('closetPanel').classList.add('show');});}
-  if(!inClo&&nearCloset){nearCloset=false;$('closetPanel').classList.remove('show');proxClear();}
+  if(inClo&&!nearCloset){nearCloset=true;proxOffer('👗 OPEN THE CLOSET',()=>{renderCloset();$('closetPanel').classList.add('show');},'closet');}
+  if(!inClo&&nearCloset){nearCloset=false;$('closetPanel').classList.remove('show');proxClear('closet');}
   if($('mysteryPanel').classList.contains('show')&&Date.now()<mysteryReadyAt)
     $('mysteryCd').textContent=fmtCountdown(mysteryReadyAt-Date.now());
 
   /* ---- Power Moves desk: quiz anytime → application table at the pitch ---- */
   const inPM=entered&&nearChest<0&&player.x>PMZONE.x&&player.x<PMZONE.x+PMZONE.w&&player.y>PMZONE.y&&player.y<PMZONE.y+PMZONE.h;
   if(inPM&&!nearPM){nearPM=true;
-    if(phase==='pitch'){if(!applied)proxOffer('📝 APPLY NOW — SPOTS LIMITED',()=>$('applyPanel').classList.add('show'));}
-    else proxOffer('⚡ PLAY POWER MOVES',()=>{renderQuiz();$('quizPanel').classList.add('show');});}
-  if(!inPM&&nearPM){nearPM=false;$('quizPanel').classList.remove('show');$('applyPanel').classList.remove('show');proxClear();}
+    if(phase==='pitch'){if(!applied)proxOffer('📝 APPLY NOW — SPOTS LIMITED',()=>$('applyPanel').classList.add('show'),'pm');}
+    else proxOffer('⚡ PLAY POWER MOVES',()=>{renderQuiz();$('quizPanel').classList.add('show');},'pm');}
+  if(!inPM&&nearPM){nearPM=false;$('quizPanel').classList.remove('show');$('applyPanel').classList.remove('show');proxClear('pm');}
 
   /* ---- VIP door (bottom of Main Stage) ---- */
   if(!treasureSeen&&inRoom('treasure',player.x,player.y))treasureSeen=true;
@@ -2013,8 +2019,8 @@ function update(dt){
   /* ---- Stage B (side stage): walk up to the rope → RSVP ---- */
   const sb=entered&&player.x>SBZONE.x&&player.x<SBZONE.x+SBZONE.w&&player.y>SBZONE.y&&player.y<SBZONE.y+SBZONE.h;
   if(sb&&!nearStageB){nearStageB=true;
-    if(!stagebLatch){stagebLatch=true;proxOffer('🎪 STAGE B — SEE WHAT\'S ON',()=>{sbSeen=true;$('stagebModal').classList.add('show');});}}
-  if(!sb&&nearStageB){nearStageB=false;stagebLatch=false;$('stagebModal').classList.remove('show');proxClear();}
+    if(!stagebLatch){stagebLatch=true;proxOffer('🎪 STAGE B — SEE WHAT\'S ON',()=>{sbSeen=true;$('stagebModal').classList.add('show');},'sb');}}
+  if(!sb&&nearStageB){nearStageB=false;stagebLatch=false;$('stagebModal').classList.remove('show');proxClear('sb');}
   if($('stagebModal').classList.contains('show'))
     $('stagebCountdown').textContent=fmtCountdown(STAGEB_DATE-Date.now());
 
