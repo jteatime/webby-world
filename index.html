@@ -261,18 +261,18 @@
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
   /* virtual joystick — bottom-left */
-  #joyWrap{position:fixed;left:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;display:none;touch-action:none}
+  #joyWrap{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;display:none;touch-action:none}
   #game.mobile #joyWrap{display:block}
   #game.mobile.stagebar #joyWrap{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   #joyBase{width:118px;height:118px;border-radius:50%;background:rgba(8,26,20,.55);border:2px solid rgba(249,200,94,.35);backdrop-filter:blur(4px);position:relative;touch-action:none}
   #joyKnob{width:52px;height:52px;border-radius:50%;background:var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.45);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
   /* single menu button — bottom-right; the whole bottom bar hides on mobile */
-  #mobMenuBtn{display:none;position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;width:58px;height:58px;border-radius:18px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:24px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  #mobMenuBtn{display:none;position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:12;width:46px;height:46px;border-radius:14px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:20px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
   #game.mobile #mobMenuBtn{display:flex}
-  #game.mobile.stagebar #mobMenuBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
   #game.mobile .hud-bottom{background:none;border:none;box-shadow:none;pointer-events:none}
   #game.mobile .hud-bottom .hud-btn{display:none!important}
-  #game.mobile #attChip{display:inline-flex!important;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:12px;font-size:11px;padding:6px 10px;pointer-events:none}
+  #game.mobile #attChip{display:none!important}
+  #game.mobile.entered #attChip{display:inline-flex!important;position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:12px;font-size:11px;padding:6px 10px;pointer-events:none}
   /* mobile menu sheet */
   #mobMenu{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:16px 16px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5)}
   #mobMenu.show{transform:translateY(0)}
@@ -280,9 +280,15 @@
   .mm-row:active{transform:scale(.98)}
   .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
   .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
-  /* contextual tap-to-open pill — bottom-centre, above the controls */
-  #ctxBtn{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:13;background:var(--gold);color:#241E10;font-weight:800;font-size:14px;border-radius:16px;padding:13px 20px;box-shadow:0 10px 30px rgba(0,0,0,.5);border:2px solid #B8871E;animation:ctxPulse 1.6s infinite;white-space:nowrap;max-width:86vw;overflow:hidden;text-overflow:ellipsis}
-  #game.mobile.stagebar #ctxBtn{bottom:calc(196px + env(safe-area-inset-bottom,0px))}
+  /* game-style ACTION button — bottom-left, opposite the stick */
+  #actWrap{display:none;position:fixed;left:16px;bottom:calc(28px + env(safe-area-inset-bottom,0px));z-index:13;flex-direction:column;align-items:center;gap:9px}
+  #game.mobile #actWrap{display:flex}
+  #game.mobile.stagebar #actWrap{bottom:calc(126px + env(safe-area-inset-bottom,0px))}
+  #actLabel{display:none;background:rgba(8,26,20,.85);color:var(--gold);font-weight:800;font-size:11.5px;border-radius:10px;padding:7px 11px;border:1px solid rgba(249,200,94,.4);white-space:nowrap;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+  #actBtn{width:76px;height:76px;border-radius:50%;background:rgba(8,26,20,.55);border:2.5px solid rgba(249,200,94,.3);color:rgba(249,200,94,.35);font-size:30px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .12s}
+  #actWrap.live #actLabel{display:block}
+  #actWrap.live #actBtn{background:var(--gold);border-color:#B8871E;color:#241E10;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite}
+  #actWrap.live #actBtn:active{transform:scale(.92)}
   @keyframes ctxPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.45)}50%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
   /* toasts read from the top on mobile — thumbs cover the bottom */
   #game.mobile #toast{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px))}
@@ -387,7 +393,7 @@
 
   <div id="joyWrap"><div id="joyBase"><div id="joyKnob"></div></div></div>
   <button id="mobMenuBtn">☰</button>
-  <button id="ctxBtn"></button>
+  <div id="actWrap"><div id="actLabel"></div><button id="actBtn">✋</button></div>
   <div id="mobMenu">
     <div class="nav-head">
       <div><div class="p-eyebrow">WEBBY WORLD</div><h3>Menu</h3></div>
@@ -1489,12 +1495,16 @@ function initMobileMenu(){
   $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
   $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
 }
-/* proximity → tap-to-open on mobile; instant on desktop */
+/* proximity → action button on mobile; instant on desktop */
 function proxOffer(label,fn){
   if(!IS_MOBILE){fn();return;}
-  ctxAction=fn;const b=$('ctxBtn');b.textContent=label;b.style.display='block';
+  ctxAction=fn;
+  const parts=Array.from(label);
+  $('actBtn').textContent=parts[0];
+  $('actLabel').textContent=label.slice(parts[0].length).trim();
+  $('actWrap').classList.add('live');
 }
-function proxClear(){ctxAction=null;$('ctxBtn').style.display='none';}
+function proxClear(){ctxAction=null;$('actWrap').classList.remove('live');$('actBtn').textContent='✋';}
 function setNavMode(m){
   navMode=m;
   $('game').classList.toggle('menumode',m==='menu');
@@ -1593,7 +1603,7 @@ function startGame(name,skin,gender='m'){
     $('game').classList.add('mobile');
     questCollapsed=true;
     initJoystick();initMobileMenu();
-    $('ctxBtn').onclick=()=>{const f=ctxAction;proxClear();if(f)f();};
+    $('actBtn').onclick=()=>{if(!ctxAction)return;const f=ctxAction;proxClear();f();};
   }
   updateBonusChip();
   $('bonusChip').onclick=()=>{const p=$('bonusPanel');
