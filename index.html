@@ -257,11 +257,37 @@
   .vid-note{position:absolute;bottom:16px;right:20px;font-size:11px;color:#41604F}
 
   @media (max-width:560px){ .optin{flex-direction:column} .hud-chip{padding:7px 10px;font-size:12px} #countdown{font-size:12px} #stageBtns{flex-direction:column} }
-  /* ---------- MOBILE: tap-to-walk + fast travel + device bonuses ---------- */
+  /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
-  #game.mobile.entered #navToggle{display:inline-block}
-  #game.mobile.entered.menumode #goBtn{display:inline-block}
   #game.entered #bonusChip{display:inline-block}
+  /* virtual joystick — bottom-left */
+  #joyWrap{position:fixed;left:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;display:none;touch-action:none}
+  #game.mobile #joyWrap{display:block}
+  #game.mobile.stagebar #joyWrap{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
+  #joyBase{width:118px;height:118px;border-radius:50%;background:rgba(8,26,20,.55);border:2px solid rgba(249,200,94,.35);backdrop-filter:blur(4px);position:relative;touch-action:none}
+  #joyKnob{width:52px;height:52px;border-radius:50%;background:var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.45);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+  /* single menu button — bottom-right; the whole bottom bar hides on mobile */
+  #mobMenuBtn{display:none;position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;width:58px;height:58px;border-radius:18px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:24px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  #game.mobile #mobMenuBtn{display:flex}
+  #game.mobile.stagebar #mobMenuBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
+  #game.mobile .hud-bottom{background:none;border:none;box-shadow:none;pointer-events:none}
+  #game.mobile .hud-bottom .hud-btn{display:none!important}
+  #game.mobile #attChip{display:inline-flex!important;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:12px;font-size:11px;padding:6px 10px;pointer-events:none}
+  /* mobile menu sheet */
+  #mobMenu{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:16px 16px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5)}
+  #mobMenu.show{transform:translateY(0)}
+  .mm-row{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid #E2D9BE;border-radius:14px;padding:13px 14px;margin-top:9px;font-weight:700;font-size:14.5px;color:#1D3A3E;text-align:left}
+  .mm-row:active{transform:scale(.98)}
+  .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
+  .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
+  /* contextual tap-to-open pill — bottom-centre, above the controls */
+  #ctxBtn{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:13;background:var(--gold);color:#241E10;font-weight:800;font-size:14px;border-radius:16px;padding:13px 20px;box-shadow:0 10px 30px rgba(0,0,0,.5);border:2px solid #B8871E;animation:ctxPulse 1.6s infinite;white-space:nowrap;max-width:86vw;overflow:hidden;text-overflow:ellipsis}
+  #game.mobile.stagebar #ctxBtn{bottom:calc(196px + env(safe-area-inset-bottom,0px))}
+  @keyframes ctxPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.45)}50%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
+  /* toasts read from the top on mobile — thumbs cover the bottom */
+  #game.mobile #toast{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px))}
+  #game.mobile #toast.raised{bottom:auto}
+  #game.mobile.mudmode #toast{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px));font-size:14px;padding:12px 18px}
   #navSheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5);max-height:72vh;overflow-y:auto}
   #navSheet.show{transform:translateY(0)}
   .nav-head{display:flex;align-items:center;justify-content:space-between}
@@ -357,6 +383,22 @@
     <div class="lb-lock">🔒</div>
     <div class="lb-t">This room is locked for VIPs</div>
     <div class="lb-s">Apply for a strategy call to unlock the VIP lounge.</div>
+  </div>
+
+  <div id="joyWrap"><div id="joyBase"><div id="joyKnob"></div></div></div>
+  <button id="mobMenuBtn">☰</button>
+  <button id="ctxBtn"></button>
+  <div id="mobMenu">
+    <div class="nav-head">
+      <div><div class="p-eyebrow">WEBBY WORLD</div><h3>Menu</h3></div>
+      <button id="mobMenuClose">✕</button>
+    </div>
+    <button class="mm-row" id="mmGo"><span class="mm-e">📍</span>Go to…<span class="mm-sub">fast travel</span></button>
+    <button class="mm-row" id="mmBonus"><span class="mm-e">🎁</span>Bonuses<span class="mm-sub" id="mmBonusSub">0/3</span></button>
+    <button class="mm-row" id="mmChat"><span class="mm-e">💬</span>Chat</button>
+    <button class="mm-row" id="mmAmb"><span class="mm-e">🌊</span><span id="mmAmbTxt">Ocean sounds</span></button>
+    <button class="mm-row" id="mmMute"><span class="mm-e">🔊</span><span id="mmMuteTxt">Sound on</span></button>
+    <button class="mm-row" id="mmDemo" style="background:#C6362B;border-color:#C6362B;color:#fff"><span class="mm-e">▶</span><span id="mmDemoTxt">Demo: start the webinar</span></button>
   </div>
 
   <div class="hud hud-bottom">
@@ -927,14 +969,14 @@ let player,npcs=[],cam={cx:0,cy:0},zoom=1;
 let puffs=[];
 let keys={},tapTarget=null;
 /* ---------- mobile + device-bonus state ---------- */
-let navMode='walk';
+let navMode='walk',joyVec={x:0,y:0},ctxAction=null;
 let bonuses={entry:false,d1:false,d2:false};
 try{Object.assign(bonuses,JSON.parse(localStorage.getItem('ww_bonuses')||'{}'));}catch(e){}
 function saveBonuses(){try{localStorage.setItem('ww_bonuses',JSON.stringify(bonuses));}catch(e){}}
 let phase='lobby',countdownT=240,slideIdx=0,slideT=0,elapsed=0,lastTs=0;
 let applied=false,vipUnlocked=false,spots=20,lockdown=false,webinarT=0;
 let confetti=[],hintTimer=10,queue=[];
-let curTrophy=-1,nearPM=false,nearChest=-1,chestLatch=-1;
+let curTrophy=-1,trophyOffer=-1,nearPM=false,nearChest=-1,chestLatch=-1;
 let powerDone=false,goldenOpen=false,quizStep=0,quizAnswers=[];
 let sortStage=0,sortScores={sage:0,path:0,alch:0,guard:0};
 let nearHat=false,nearCal=false,nearCloset=false,nearLB=false;
@@ -1403,7 +1445,7 @@ function teleportTo(d){
     toast('🔒 Doors are locked until the training ends');return;}
   $('navSheet').classList.remove('show');
   if(transitioning)return;
-  transitioning=true;tapTarget=null;
+  transitioning=true;tapTarget=null;joyVec={x:0,y:0};
   const rl=$('roomLoad');$('roomLoadTxt').textContent=('HEADING TO '+d.name).toUpperCase()+'…';
   rl.style.display='flex';rl.style.opacity=1;sfxWhoosh();
   setTimeout(()=>{
@@ -1414,6 +1456,45 @@ function teleportTo(d){
     toast(d.e+' '+d.name,2400);
   },500);
 }
+function initJoystick(){
+  const base=$('joyBase'),knob=$('joyKnob');let pid=null;
+  const R=59,K=33;
+  const setVec=e=>{
+    const r=base.getBoundingClientRect();
+    let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
+    const d=Math.hypot(dx,dy)||1,cl=Math.min(d,R-K/2);
+    dx=dx/d*cl;dy=dy/d*cl;
+    knob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
+    joyVec={x:dx/(R-K/2),y:dy/(R-K/2)};
+  };
+  base.addEventListener('pointerdown',e=>{pid=e.pointerId;base.setPointerCapture(pid);setVec(e);e.preventDefault();});
+  base.addEventListener('pointermove',e=>{if(e.pointerId===pid)setVec(e);});
+  const end=e=>{if(pid===null||e.pointerId!==pid)return;pid=null;joyVec={x:0,y:0};knob.style.transform='translate(-50%,-50%)';};
+  base.addEventListener('pointerup',end);base.addEventListener('pointercancel',end);
+}
+function initMobileMenu(){
+  const menu=$('mobMenu');
+  const close=()=>menu.classList.remove('show');
+  $('mobMenuBtn').onclick=()=>{
+    $('mmBonusSub').textContent=(bonuses.entry?1:0)+(bonuses.d1?1:0)+(bonuses.d2?1:0)+'/3';
+    $('mmDemoTxt').textContent=$('demoBtn').textContent.replace('▶ ','').replace('⏭ ','');
+    $('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';
+    menu.classList.add('show');
+  };
+  $('mobMenuClose').onclick=close;
+  $('mmGo').onclick=()=>{close();renderNav();$('navSheet').classList.add('show');};
+  $('mmBonus').onclick=()=>{close();$('bonusChip').onclick();};
+  $('mmChat').onclick=()=>{close();$('chatToggle').onclick();};
+  $('mmAmb').onclick=()=>{$('ambBtn').onclick();$('mmAmbTxt').textContent=$('ambBtn').textContent;};
+  $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
+  $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
+}
+/* proximity → tap-to-open on mobile; instant on desktop */
+function proxOffer(label,fn){
+  if(!IS_MOBILE){fn();return;}
+  ctxAction=fn;const b=$('ctxBtn');b.textContent=label;b.style.display='block';
+}
+function proxClear(){ctxAction=null;$('ctxBtn').style.display='none';}
 function setNavMode(m){
   navMode=m;
   $('game').classList.toggle('menumode',m==='menu');
@@ -1511,7 +1592,8 @@ function startGame(name,skin,gender='m'){
   if(IS_MOBILE){
     $('game').classList.add('mobile');
     questCollapsed=true;
-    $('demoBtn').textContent='▶ Demo';
+    initJoystick();initMobileMenu();
+    $('ctxBtn').onclick=()=>{const f=ctxAction;proxClear();if(f)f();};
   }
   updateBonusChip();
   $('bonusChip').onclick=()=>{const p=$('bonusPanel');
@@ -1622,6 +1704,7 @@ function update(dt){
     if(keys['a']||keys['arrowleft'])dx-=1;
     if(keys['d']||keys['arrowright'])dx+=1;
     if(dx||dy){tapTarget=null;const l=Math.hypot(dx,dy);movePlayer(dx/l,dy/l,dt);}
+    else if(Math.hypot(joyVec.x,joyVec.y)>0.18){tapTarget=null;const l=Math.hypot(joyVec.x,joyVec.y);movePlayer(joyVec.x/l,joyVec.y/l,dt);}
     else if(tapTarget){const d=dist(player.x,player.y,tapTarget.x,tapTarget.y);
       if(d<6)tapTarget=null;else movePlayer((tapTarget.x-player.x)/d,(tapTarget.y-player.y)/d,dt);}
     else player.walkT=0;
@@ -1637,7 +1720,7 @@ function update(dt){
     }
     const t=MUD_DOOR_TRIGGER;
     if(!transitioning&&player.x>t.x&&player.x<t.x+t.w&&player.y>t.y&&player.y<t.y+t.h){
-      transitioning=true;tapTarget=null;
+      transitioning=true;tapTarget=null;joyVec={x:0,y:0};
       const rl=$('roomLoad');rl.style.display='flex';rl.style.opacity=1;
       sfxWhoosh();
       setTimeout(()=>{
@@ -1649,7 +1732,7 @@ function update(dt){
         $('mudChip').style.display='none';
         rl.style.opacity=0;
         setTimeout(()=>{rl.style.display='none';transitioning=false;},380);
-        toast('🚪 Welcome to the lobby — the Main Stage is to the right',3400);
+        toast(IS_MOBILE?'🚪 Welcome to the lobby — the Main Stage is up ahead':'🚪 Welcome to the lobby — the Main Stage is to the right',3400);
         $('hint').style.opacity=0;hintTimer=0;
         onEventEntered();
       },950);
@@ -1659,8 +1742,8 @@ function update(dt){
   /* ---- hall of fame: auto open/close on proximity, never blocks movement ---- */
   if(entered){
     let hit=-1;PEDS.forEach((p,i)=>{if(dist(player.x,player.y,p.x,p.y+8)<74)hit=i;});
-    if(hit>=0&&hit!==curTrophy)openTrophy(hit);
-    if(hit<0&&curTrophy>=0){$('hofCard').classList.remove('show');curTrophy=-1;const hv=$('hofVid');if(hv.pause)hv.pause();}
+    if(hit>=0&&hit!==curTrophy&&hit!==trophyOffer){trophyOffer=hit;proxOffer('🏆 VIEW THIS WIN',()=>openTrophy(hit));}
+    if(hit<0){trophyOffer=-1;if(curTrophy>=0){$('hofCard').classList.remove('show');curTrophy=-1;const hv=$('hofVid');if(hv.pause)hv.pause();}proxClear();}
   }
 
   /* ---- treasure chests ---- */
@@ -1668,7 +1751,8 @@ function update(dt){
     let hitC=-1;
     CHESTS.forEach((c,i)=>{if(dist(player.x,player.y,c.x,c.y)<46)hitC=i;});
     if(hitC!==nearChest){
-      // leaving previous chest → close its panels
+      // leaving previous chest → close its panels + clear the tap prompt
+      if(nearChest>=0&&hitC<0)proxClear();
       $('resourcePanel').classList.remove('show');
       $('goldenPanel').classList.remove('show');
       $('mysteryPanel').classList.remove('show');
@@ -1677,50 +1761,53 @@ function update(dt){
       if(hitC>=0&&hitC!==chestLatch){
         chestLatch=hitC;
         const t=CHESTS[hitC].type;
-        if(t==='open'){$('resourcePanel').classList.add('show');if(!lv.bonus){lv.bonus=true;awardLevel('opened the bonus chest');}}
-        else if(t==='day2')showLocked('🔒 LOCKED CHEST','Opens on Day Two','Come back tomorrow — Day 2 unlocks this one.');
-        else if(t==='day3')showLocked('🔒 LOCKED CHEST','Opens on Day Three','The finale chest. Day 3 is the key.');
-        else if(t==='grad')showLocked('🎓 GRADUATION CHEST','Opens at graduation','Finish all three days and this one is yours.');
-        else if(t==='mystery'){renderMystery();$('mysteryPanel').classList.add('show');}
-        else if(t==='gold'){
-          if(!powerDone)showLocked('👑 GOLDEN CHEST','Complete your Power Moves','Finish the Power Moves at the desk behind you to open this chest.');
-          else{
-            if(!goldenOpen){goldenOpen=true;burstConfetti(CHESTS[4].x,CHESTS[4].y-20,60);sfxPop();toast('👑 GOLDEN CHEST UNLOCKED!');}
-            $('goldenPanel').classList.add('show');
+        const labels={open:'🎁 OPEN THE BONUS CHEST',day2:'🔒 INSPECT CHEST',day3:'🔒 INSPECT CHEST',grad:'🎓 INSPECT CHEST',mystery:'❓ OPEN THE MYSTERY CHEST',gold:'👑 OPEN THE GOLDEN CHEST'};
+        proxOffer(labels[t],()=>{
+          if(t==='open'){$('resourcePanel').classList.add('show');if(!lv.bonus){lv.bonus=true;awardLevel('opened the bonus chest');}}
+          else if(t==='day2')showLocked('🔒 LOCKED CHEST','Opens on Day Two','Come back tomorrow — Day 2 unlocks this one.');
+          else if(t==='day3')showLocked('🔒 LOCKED CHEST','Opens on Day Three','The finale chest. Day 3 is the key.');
+          else if(t==='grad')showLocked('🎓 GRADUATION CHEST','Opens at graduation','Finish all three days and this one is yours.');
+          else if(t==='mystery'){renderMystery();$('mysteryPanel').classList.add('show');}
+          else if(t==='gold'){
+            if(!powerDone)showLocked('👑 GOLDEN CHEST','Complete your Power Moves','Finish the Power Moves at the desk behind you to open this chest.');
+            else{
+              if(!goldenOpen){goldenOpen=true;burstConfetti(CHESTS[4].x,CHESTS[4].y-20,60);sfxPop();toast('👑 GOLDEN CHEST UNLOCKED!');}
+              $('goldenPanel').classList.add('show');
+            }
           }
-        }
+        });
       }
-      if(hitC<0)chestLatch=-1;
+      if(hitC<0){chestLatch=-1;}
     }
   }
 
   /* ---- sorting hat / wall calendar / VIP closet ---- */
   const inHat=entered&&dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<62;
-  if(inHat&&!nearHat){nearHat=true;renderSort();$('sortPanel').classList.add('show');}
-  if(!inHat&&nearHat){nearHat=false;$('sortPanel').classList.remove('show');}
+  if(inHat&&!nearHat){nearHat=true;proxOffer('🎩 TRY THE SORTING HAT',()=>{renderSort();$('sortPanel').classList.add('show');});}
+  if(!inHat&&nearHat){nearHat=false;$('sortPanel').classList.remove('show');proxClear();}
   const inCal=entered&&dist(player.x,player.y,CAL_OBJ.x,CAL_OBJ.y+14)<58&&player.y>380;
-  if(inCal&&!nearCal){nearCal=true;calSeen=true;renderCalendar();$('calendarPanel').classList.add('show');}
-  if(!inCal&&nearCal){nearCal=false;$('calendarPanel').classList.remove('show');}
+  if(inCal&&!nearCal){nearCal=true;proxOffer('📅 CHECK THE CALENDAR',()=>{calSeen=true;renderCalendar();$('calendarPanel').classList.add('show');});}
+  if(!inCal&&nearCal){nearCal=false;$('calendarPanel').classList.remove('show');proxClear();}
   const inLB=entered&&dist(player.x,player.y,LB_OBJ.x,LB_OBJ.y)<58;
-  if(inLB&&!nearLB){nearLB=true;lbSeen=true;renderLeader();$('leaderPanel').classList.add('show');}
-  if(!inLB&&nearLB){nearLB=false;$('leaderPanel').classList.remove('show');}
+  if(inLB&&!nearLB){nearLB=true;proxOffer('🥇 VIEW HOUSE RANKINGS',()=>{lbSeen=true;renderLeader();$('leaderPanel').classList.add('show');});}
+  if(!inLB&&nearLB){nearLB=false;$('leaderPanel').classList.remove('show');proxClear();}
   const inGrand=entered&&vipUnlocked&&dist(player.x,player.y,GRANDC.x,GRANDC.y)<84;
-  if(inGrand&&!nearGrand){nearGrand=true;
+  if(inGrand&&!nearGrand){nearGrand=true;proxOffer('✦ OPEN THE GRAND CHEST ✦',()=>{
     if(!grandOpen){grandOpen=true;burstConfetti(GRANDC.x,GRANDC.y-46,90);sfxChime();}
-    $('grandModal').classList.add('show');}
-  if(!inGrand&&nearGrand){nearGrand=false;$('grandModal').classList.remove('show');}
+    $('grandModal').classList.add('show');});}
+  if(!inGrand&&nearGrand){nearGrand=false;$('grandModal').classList.remove('show');proxClear();}
   const inClo=entered&&vipUnlocked&&dist(player.x,player.y,CLOSET.x+CLOSET.w/2,CLOSET.y+CLOSET.h)<66;
-  if(inClo&&!nearCloset){nearCloset=true;renderCloset();$('closetPanel').classList.add('show');}
-  if(!inClo&&nearCloset){nearCloset=false;$('closetPanel').classList.remove('show');}
+  if(inClo&&!nearCloset){nearCloset=true;proxOffer('👗 OPEN THE CLOSET',()=>{renderCloset();$('closetPanel').classList.add('show');});}
+  if(!inClo&&nearCloset){nearCloset=false;$('closetPanel').classList.remove('show');proxClear();}
   if($('mysteryPanel').classList.contains('show')&&Date.now()<mysteryReadyAt)
     $('mysteryCd').textContent=fmtCountdown(mysteryReadyAt-Date.now());
 
   /* ---- Power Moves desk: quiz anytime → application table at the pitch ---- */
   const inPM=entered&&nearChest<0&&player.x>PMZONE.x&&player.x<PMZONE.x+PMZONE.w&&player.y>PMZONE.y&&player.y<PMZONE.y+PMZONE.h;
   if(inPM&&!nearPM){nearPM=true;
-    if(phase==='pitch'){if(!applied)$('applyPanel').classList.add('show');}
-    else{renderQuiz();$('quizPanel').classList.add('show');}}
-  if(!inPM&&nearPM){nearPM=false;$('quizPanel').classList.remove('show');$('applyPanel').classList.remove('show');}
+    if(phase==='pitch'){if(!applied)proxOffer('📝 APPLY NOW — SPOTS LIMITED',()=>$('applyPanel').classList.add('show'));}
+    else proxOffer('⚡ PLAY POWER MOVES',()=>{renderQuiz();$('quizPanel').classList.add('show');});}
+  if(!inPM&&nearPM){nearPM=false;$('quizPanel').classList.remove('show');$('applyPanel').classList.remove('show');proxClear();}
 
   /* ---- VIP door (bottom of Main Stage) ---- */
   if(!treasureSeen&&inRoom('treasure',player.x,player.y))treasureSeen=true;
@@ -1742,8 +1829,8 @@ function update(dt){
   /* ---- Stage B (side stage): walk up to the rope → RSVP ---- */
   const sb=entered&&player.x>SBZONE.x&&player.x<SBZONE.x+SBZONE.w&&player.y>SBZONE.y&&player.y<SBZONE.y+SBZONE.h;
   if(sb&&!nearStageB){nearStageB=true;
-    if(!stagebLatch){stagebLatch=true;sbSeen=true;$('stagebModal').classList.add('show');}}
-  if(!sb&&nearStageB){nearStageB=false;stagebLatch=false;$('stagebModal').classList.remove('show');}
+    if(!stagebLatch){stagebLatch=true;proxOffer('🎪 STAGE B — SEE WHAT\'S ON',()=>{sbSeen=true;$('stagebModal').classList.add('show');});}}
+  if(!sb&&nearStageB){nearStageB=false;stagebLatch=false;$('stagebModal').classList.remove('show');proxClear();}
   if($('stagebModal').classList.contains('show'))
     $('stagebCountdown').textContent=fmtCountdown(STAGEB_DATE-Date.now());
 
