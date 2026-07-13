@@ -266,9 +266,9 @@
   /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
-  #bigClose{display:none;position:fixed;right:14px;bottom:calc(26px + env(safe-area-inset-bottom,0px));z-index:33;width:58px;height:58px;border-radius:50%;background:var(--gold);color:#241E10;font-size:26px;font-weight:800;align-items:center;justify-content:center;border:2px solid #B8871E;box-shadow:0 10px 28px rgba(0,0,0,.5)}
-  #bigClose.on{display:flex}
-  #bigClose:active{transform:scale(.92)}
+  #bigClose{display:none;position:sticky;bottom:-14px;width:100%;margin-top:14px;background:var(--gold);color:#241E10;font-size:15px;font-weight:800;padding:14px;border-radius:12px;border:2px solid #B8871E;box-shadow:0 -6px 18px rgba(0,0,0,.15);text-align:center;z-index:5}
+  #bigClose.on{display:block}
+  #bigClose:active{transform:scale(.97)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
   #game.mobile.entered #joyWrap{display:block}
@@ -404,7 +404,7 @@
 
   <div id="joyWrap"><div id="joyBase"><span class="ja ja-u"></span><span class="ja ja-d"></span><span class="ja ja-l"></span><span class="ja ja-r"></span><div id="joyKnob"></div></div></div>
   <button id="mobMenuBtn">☰</button>
-  <button id="bigClose">✕</button>
+  <button id="bigClose">✕ &nbsp;Close this tab</button>
 
   <div id="mobMenu">
     <div class="nav-head">
@@ -992,8 +992,13 @@ let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null;
 const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','profileCard','hofCard','bonusPanel'];
 function updateBigClose(){
   if(!IS_MOBILE)return;
-  const any=CLOSE_WATCH.some(id=>$(id).classList.contains('show'));
-  $('bigClose').classList.toggle('on',any);
+  const btn=$('bigClose');
+  const openId=CLOSE_WATCH.find(id=>$(id).classList.contains('show'));
+  if(!openId){btn.classList.remove('on');return;}
+  const el=$(openId);
+  const host=el.classList.contains('modal-bg')?(el.firstElementChild||el):el;
+  if(btn.parentNode!==host)host.appendChild(btn);
+  btn.classList.add('on');
 }
 let bonuses={entry:false,d1:false,d2:false};
 try{Object.assign(bonuses,JSON.parse(localStorage.getItem('ww_bonuses')||'{}'));}catch(e){}
@@ -1886,13 +1891,13 @@ function update(dt){
   }
 
   /* ---- sorting hat / wall calendar / VIP closet ---- */
-  const inHat=entered&&dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<62;
+  const inHat=entered&&dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62);
   if(inHat&&!nearHat){nearHat=true;proxOffer('🎩 TRY THE SORTING HAT',()=>{renderSort();$('sortPanel').classList.add('show');});}
   if(!inHat&&nearHat){nearHat=false;$('sortPanel').classList.remove('show');proxClear();}
-  const inCal=entered&&dist(player.x,player.y,CAL_OBJ.x,CAL_OBJ.y+14)<58&&player.y>380;
+  const inCal=entered&&dist(player.x,player.y,CAL_OBJ.x,CAL_OBJ.y+14)<(IS_MOBILE?88:58)&&player.y>380;
   if(inCal&&!nearCal){nearCal=true;proxOffer('📅 CHECK THE CALENDAR',()=>{calSeen=true;renderCalendar();$('calendarPanel').classList.add('show');});}
   if(!inCal&&nearCal){nearCal=false;$('calendarPanel').classList.remove('show');proxClear();}
-  const inLB=entered&&dist(player.x,player.y,LB_OBJ.x,LB_OBJ.y)<58;
+  const inLB=entered&&dist(player.x,player.y,LB_OBJ.x,LB_OBJ.y)<(IS_MOBILE?88:58);
   if(inLB&&!nearLB){nearLB=true;proxOffer('🥇 VIEW HOUSE RANKINGS',()=>{lbSeen=true;renderLeader();$('leaderPanel').classList.add('show');});}
   if(!inLB&&nearLB){nearLB=false;$('leaderPanel').classList.remove('show');proxClear();}
   const inGrand=entered&&vipUnlocked&&dist(player.x,player.y,GRANDC.x,GRANDC.y)<84;
