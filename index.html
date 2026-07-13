@@ -260,12 +260,13 @@
   /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
-  /* virtual joystick — bottom-left */
-  #joyWrap{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:12;display:none;touch-action:none}
-  #game.mobile #joyWrap{display:block}
-  #game.mobile.stagebar #joyWrap{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
-  #joyBase{width:118px;height:118px;border-radius:50%;background:rgba(8,26,20,.55);border:2px solid rgba(249,200,94,.35);backdrop-filter:blur(4px);position:relative;touch-action:none}
-  #joyKnob{width:52px;height:52px;border-radius:50%;background:var(--gold);box-shadow:0 4px 14px rgba(0,0,0,.45);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+  /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
+  #joyWrap{position:fixed;left:50%;top:72%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
+  #game.mobile.entered #joyWrap{display:block}
+  #joyWrap.live{transition:opacity .1s;opacity:1}
+  #joyBase{width:112px;height:112px;border-radius:50%;background:rgba(8,26,20,.38);border:2px solid rgba(249,200,94,.30);position:relative}
+  #joyKnob{width:48px;height:48px;border-radius:50%;background:rgba(249,200,94,.85);box-shadow:0 4px 14px rgba(0,0,0,.4);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transition:transform .22s cubic-bezier(.3,1.1,.5,1)}
+  #joyWrap.live #joyKnob{transition:none}
   /* single menu button — bottom-right; the whole bottom bar hides on mobile */
   #mobMenuBtn{display:none;position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:12;width:46px;height:46px;border-radius:14px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:20px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
   #game.mobile #mobMenuBtn{display:flex}
@@ -280,20 +281,16 @@
   .mm-row:active{transform:scale(.98)}
   .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
   .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
-  /* game-style ACTION button — bottom-left, opposite the stick */
-  #actWrap{display:none;position:fixed;left:16px;bottom:calc(28px + env(safe-area-inset-bottom,0px));z-index:13;flex-direction:column;align-items:center;gap:9px}
-  #game.mobile #actWrap{display:flex}
-  #game.mobile.stagebar #actWrap{bottom:calc(126px + env(safe-area-inset-bottom,0px))}
-  #actLabel{display:none;background:rgba(8,26,20,.85);color:var(--gold);font-weight:800;font-size:11.5px;border-radius:10px;padding:7px 11px;border:1px solid rgba(249,200,94,.4);white-space:nowrap;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
-  #actBtn{width:76px;height:76px;border-radius:50%;background:rgba(8,26,20,.55);border:2.5px solid rgba(249,200,94,.3);color:rgba(249,200,94,.35);font-size:30px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:transform .12s}
-  #actWrap.live #actLabel{display:block}
-  #actWrap.live #actBtn{background:var(--gold);border-color:#B8871E;color:#241E10;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite}
-  #actWrap.live #actBtn:active{transform:scale(.92)}
-  @keyframes ctxPulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.45)}50%{box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
+  /* everything the player needs to SEE lives at the top on mobile */
+  #game.mobile #stageBar{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px));padding:10px 12px;gap:10px;
+    background:linear-gradient(0deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.94) 30%);transform:translateY(-140%)}
+  #game.mobile #stageBar.show{transform:translateY(0)}
+  #game.mobile #stageBar .sb-label{font-size:10.5px;letter-spacing:.14em}
+  #game.mobile #stageBar button{font-size:11px;padding:8px 11px}
   /* toasts read from the top on mobile — thumbs cover the bottom */
-  #game.mobile #toast{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px))}
+  #game.mobile #toast{bottom:auto;top:calc(118px + env(safe-area-inset-top,0px))}
   #game.mobile #toast.raised{bottom:auto}
-  #game.mobile.mudmode #toast{bottom:auto;top:calc(56px + env(safe-area-inset-top,0px));font-size:14px;padding:12px 18px}
+  #game.mobile.mudmode #toast{bottom:auto;top:calc(118px + env(safe-area-inset-top,0px));font-size:14px;padding:12px 18px}
   #navSheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5);max-height:72vh;overflow-y:auto}
   #navSheet.show{transform:translateY(0)}
   .nav-head{display:flex;align-items:center;justify-content:space-between}
@@ -393,7 +390,7 @@
 
   <div id="joyWrap"><div id="joyBase"><div id="joyKnob"></div></div></div>
   <button id="mobMenuBtn">☰</button>
-  <div id="actWrap"><div id="actLabel"></div><button id="actBtn">✋</button></div>
+
   <div id="mobMenu">
     <div class="nav-head">
       <div><div class="p-eyebrow">WEBBY WORLD</div><h3>Menu</h3></div>
@@ -729,6 +726,9 @@ drawAvatarPreview();
     $(id).classList.add('sel');drawAvatarPreview();});
 });
 $('enterBtn').addEventListener('click',()=>{const name=$('nameInput').value.trim()||'You';startGame(name,SKINS[selSkin],selGender);});
+/* DESIGN BUILD: skip landing/opt-in/creator — boot straight into the world */
+const SKIP_LOGIN=true;
+if(SKIP_LOGIN)startGame('Explorer',SKINS[Math.floor(Math.random()*SKINS.length)],'m');
 
 /* ---------- portrait placeholder generator ---------- */
 function portraitURI(o){
@@ -975,7 +975,7 @@ let player,npcs=[],cam={cx:0,cy:0},zoom=1;
 let puffs=[];
 let keys={},tapTarget=null;
 /* ---------- mobile + device-bonus state ---------- */
-let navMode='walk',joyVec={x:0,y:0},ctxAction=null;
+let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null;
 let bonuses={entry:false,d1:false,d2:false};
 try{Object.assign(bonuses,JSON.parse(localStorage.getItem('ww_bonuses')||'{}'));}catch(e){}
 function saveBonuses(){try{localStorage.setItem('ww_bonuses',JSON.stringify(bonuses));}catch(e){}}
@@ -1462,21 +1462,42 @@ function teleportTo(d){
     toast(d.e+' '+d.name,2400);
   },500);
 }
-function initJoystick(){
-  const base=$('joyBase'),knob=$('joyKnob');let pid=null;
-  const R=59,K=33;
-  const setVec=e=>{
-    const r=base.getBoundingClientRect();
-    let dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-    const d=Math.hypot(dx,dy)||1,cl=Math.min(d,R-K/2);
-    dx=dx/d*cl;dy=dy/d*cl;
-    knob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
-    joyVec={x:dx/(R-K/2),y:dy/(R-K/2)};
+function initFloatingStick(){
+  /* Touch anywhere → the stick appears under the thumb and drives movement.
+     A quick tap does UI hits; a quick DOUBLE tap walks the character there. */
+  const wrap=$('joyWrap'),knob=$('joyKnob');
+  let pid=null,ox=0,oy=0,t0=0,moved=false,lastTap=0,lastX=0,lastY=0;
+  const MAXR=44;
+  const show=(x,y)=>{wrap.classList.add('live');wrap.style.left=x+'px';wrap.style.top=y+'px';};
+  const hide=()=>{wrap.classList.remove('live');wrap.style.left='50%';wrap.style.top='72%';knob.style.transform='translate(-50%,-50%)';joyVec={x:0,y:0};};
+  cv.addEventListener('pointerdown',e=>{
+    if(!IS_MOBILE||transitioning||vidOpen||pid!==null)return;
+    pid=e.pointerId;cv.setPointerCapture(pid);
+    ox=e.clientX;oy=e.clientY;t0=performance.now();moved=false;
+    show(ox,oy);
+  });
+  cv.addEventListener('pointermove',e=>{
+    if(e.pointerId!==pid)return;
+    let dx=e.clientX-ox,dy=e.clientY-oy;
+    const d=Math.hypot(dx,dy);
+    if(d>10)moved=true;
+    const cl=Math.min(d,MAXR),k=d?cl/d:0;
+    knob.style.transform=`translate(calc(-50% + ${dx*k}px),calc(-50% + ${dy*k}px))`;
+    joyVec=d>10?{x:dx/Math.max(d,MAXR),y:dy/Math.max(d,MAXR)}:{x:0,y:0};
+  });
+  const end=e=>{
+    if(e.pointerId!==pid)return;
+    const quick=performance.now()-t0<260&&!moved;
+    pid=null;hide();
+    if(!quick)return;
+    const now=performance.now();
+    const dbl=now-lastTap<330&&Math.hypot(e.clientX-lastX,e.clientY-lastY)<36;
+    lastTap=now;lastX=e.clientX;lastY=e.clientY;
+    const r=cv.getBoundingClientRect();
+    const wx=(e.clientX-r.left-vw/2)/zoom+cam.cx, wy=(e.clientY-r.top-vh/2)/zoom+cam.cy;
+    if(tapHandler)tapHandler(wx,wy,dbl);
   };
-  base.addEventListener('pointerdown',e=>{pid=e.pointerId;base.setPointerCapture(pid);setVec(e);e.preventDefault();});
-  base.addEventListener('pointermove',e=>{if(e.pointerId===pid)setVec(e);});
-  const end=e=>{if(pid===null||e.pointerId!==pid)return;pid=null;joyVec={x:0,y:0};knob.style.transform='translate(-50%,-50%)';};
-  base.addEventListener('pointerup',end);base.addEventListener('pointercancel',end);
+  cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',e=>{if(e.pointerId===pid){pid=null;hide();}});
 }
 function initMobileMenu(){
   const menu=$('mobMenu');
@@ -1495,16 +1516,36 @@ function initMobileMenu(){
   $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
   $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
 }
-/* proximity → action button on mobile; instant on desktop */
-function proxOffer(label,fn){
-  if(!IS_MOBILE){fn();return;}
-  ctxAction=fn;
-  const parts=Array.from(label);
-  $('actBtn').textContent=parts[0];
-  $('actLabel').textContent=label.slice(parts[0].length).trim();
-  $('actWrap').classList.add('live');
+/* floating "this is interactive" markers — mobile world only */
+function drawMarkers(){
+  if(!IS_MOBILE||!entered)return;
+  const M=[
+    {x:HAT_OBJ.x,y:HAT_OBJ.y-42,e:'🎩'},
+    {x:CAL_OBJ.x,y:CAL_OBJ.y-36,e:'📅'},
+    {x:LB_OBJ.x+16,y:LB_OBJ.y-58,e:'🥇'},
+    {x:PM.x+PM.w/2,y:PM.y+PM.h+42,e:phase==='pitch'?'📝':'⚡'},
+    {x:SBZONE.x+18,y:SBZONE.y-16,e:'🎪'},
+    {x:GRANDC.x,y:GRAND.y-28,e:'✦'},
+  ];
+  CHESTS.forEach(c=>M.push({x:c.x,y:c.y-36,e:({open:'🎁',day2:'🔒',day3:'🔒',grad:'🎓',gold:'👑',mystery:'❓'})[c.type]}));
+  PEDS.forEach(p=>M.push({x:p.x,y:p.y-48,e:'🏆'}));
+  if(vipUnlocked)M.push({x:CLOSET.x+CLOSET.w/2,y:CLOSET.y-18,e:'👗'});
+  M.forEach((m,i)=>{
+    const y=m.y+Math.sin(elapsed*2.6+i*1.3)*4;
+    ctx.fillStyle='rgba(8,26,20,.78)';
+    ctx.beginPath();ctx.arc(m.x,y,13,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(249,200,94,.75)';ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.arc(m.x,y,13,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(m.x-4,y+11);ctx.lineTo(m.x+4,y+11);ctx.lineTo(m.x,y+19);ctx.closePath();
+    ctx.fillStyle='rgba(8,26,20,.78)';ctx.fill();
+    ctx.font='13px "Lato"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='#F9C85E';ctx.fillText(m.e,m.x,y+1);
+    ctx.textBaseline='alphabetic';
+  });
 }
-function proxClear(){ctxAction=null;$('actWrap').classList.remove('live');$('actBtn').textContent='✋';}
+/* interactables announce themselves with floating markers; walking up opens the popup */
+function proxOffer(label,fn){fn();}
+function proxClear(){}
 function setNavMode(m){
   navMode=m;
   $('game').classList.toggle('menumode',m==='menu');
@@ -1542,10 +1583,8 @@ function startGame(name,skin,gender='m'){
   window.addEventListener('keydown',e=>{if(typing(e)){keys={};return;}keys[e.key.toLowerCase()]=true;
     if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();});
   window.addEventListener('keyup',e=>{if(typing(e))return;keys[e.key.toLowerCase()]=false;});
-  cv.addEventListener('pointerdown',e=>{
+  function handleTap(wx,wy,walkOk){
     if(transitioning||vidOpen)return;
-    const r=cv.getBoundingClientRect();
-    const wx=(e.clientX-r.left-vw/2)/zoom+cam.cx, wy=(e.clientY-r.top-vh/2)/zoom+cam.cy;
     if(entered){
       const qbH=questCollapsed?QB.hMin:QB.hFull;
       if(wx>QB.x-10&&wx<QB.x+QB.w+10&&wy>QB.y-10&&wy<QB.y+qbH+14){
@@ -1555,8 +1594,15 @@ function startGame(name,skin,gender='m'){
       if(hitChar){openProfile(hitChar);return;}
     }
     $('profileCard').classList.remove('show');
-    tapTarget={x:wx,y:wy};
+    if(walkOk)tapTarget={x:wx,y:wy};
+  }
+  tapHandler=handleTap;
+  if(!IS_MOBILE)cv.addEventListener('pointerdown',e=>{
+    const r=cv.getBoundingClientRect();
+    const wx=(e.clientX-r.left-vw/2)/zoom+cam.cx, wy=(e.clientY-r.top-vh/2)/zoom+cam.cy;
+    handleTap(wx,wy,true);
   });
+  else initFloatingStick();
 
   $('demoBtn').onclick=()=>{if(phase==='lobby')startWebinar();else if(phase==='webinar')startPitch();};
   $('fullBtn').onclick=()=>openVideo('screen');
@@ -1602,8 +1648,7 @@ function startGame(name,skin,gender='m'){
   if(IS_MOBILE){
     $('game').classList.add('mobile');
     questCollapsed=true;
-    initJoystick();initMobileMenu();
-    $('actBtn').onclick=()=>{if(!ctxAction)return;const f=ctxAction;proxClear();f();};
+    initMobileMenu();
   }
   updateBonusChip();
   $('bonusChip').onclick=()=>{const p=$('bonusPanel');
@@ -2011,6 +2056,7 @@ function render(){
       drawPill(label,px2,py2,(r.id==='vip'&&!vipUnlocked)||r.id==='stageB');
     });
     drawPill(vipUnlocked?'VIP ENTRANCE ✦':'VIP ENTRANCE 🔒',VIPDOOR.x,VIPDOOR.pillY,!vipUnlocked);
+    drawMarkers();
 
     drawPuffs();
     [...npcs,player].sort((a,b)=>a.y-b.y).forEach(c=>{
