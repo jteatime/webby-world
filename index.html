@@ -181,6 +181,12 @@
   /* proximity panels (non-blocking, auto-close on walk-away) */
   .panel{position:absolute;left:50%;bottom:110px;transform:translateX(-50%) translateY(16px);width:min(390px,90vw);background:var(--paper);color:#241E10;border-radius:16px;padding:20px 22px;opacity:0;pointer-events:none;transition:all .32s cubic-bezier(.3,1.35,.55,1);box-shadow:0 20px 60px rgba(0,0,0,.55)}
   .panel.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  #game.mobile .panel{bottom:auto;top:calc(54px + env(safe-area-inset-top,0px));transform:translateX(-50%) translateY(-12px);width:min(340px,92vw);max-height:46vh;overflow-y:auto;padding:14px 16px;z-index:14}
+  #game.mobile .panel.show{transform:translateX(-50%) translateY(0)}
+  #game.mobile .panel h3{font-size:17px}
+  #game.mobile .panel p{font-size:12.5px}
+  #game.mobile .panel .btn-cta{font-size:13.5px;padding:10px;margin-top:10px}
+  #game.mobile .res-row{padding:8px 10px;margin-top:9px}
   .panel .p-eyebrow{font-family:var(--pixel);font-size:10px;letter-spacing:2px;color:#A0752B;margin-bottom:6px}
   .panel h3{font-family:var(--display);font-size:20px;line-height:1.15;margin-bottom:8px}
   .panel p{font-size:14px;line-height:1.5;color:#5B5340}
@@ -261,11 +267,16 @@
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
-  #joyWrap{position:fixed;left:50%;top:72%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
+  #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
   #game.mobile.entered #joyWrap{display:block}
   #joyWrap.live{transition:opacity .1s;opacity:1}
   #joyBase{width:112px;height:112px;border-radius:50%;background:rgba(8,26,20,.38);border:2px solid rgba(249,200,94,.30);position:relative}
   #joyKnob{width:48px;height:48px;border-radius:50%;background:rgba(249,200,94,.85);box-shadow:0 4px 14px rgba(0,0,0,.4);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transition:transform .22s cubic-bezier(.3,1.1,.5,1)}
+  .ja{position:absolute;width:0;height:0;border:6px solid transparent}
+  .ja-u{left:50%;top:9px;transform:translateX(-50%);border-top:0;border-bottom:9px solid rgba(249,200,94,.8)}
+  .ja-d{left:50%;bottom:9px;transform:translateX(-50%);border-bottom:0;border-top:9px solid rgba(249,200,94,.8)}
+  .ja-l{top:50%;left:9px;transform:translateY(-50%);border-left:0;border-right:9px solid rgba(249,200,94,.8)}
+  .ja-r{top:50%;right:9px;transform:translateY(-50%);border-right:0;border-left:9px solid rgba(249,200,94,.8)}
   #joyWrap.live #joyKnob{transition:none}
   /* single menu button — bottom-right; the whole bottom bar hides on mobile */
   #mobMenuBtn{display:none;position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:12;width:46px;height:46px;border-radius:14px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:20px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
@@ -388,7 +399,7 @@
     <div class="lb-s">Apply for a strategy call to unlock the VIP lounge.</div>
   </div>
 
-  <div id="joyWrap"><div id="joyBase"><div id="joyKnob"></div></div></div>
+  <div id="joyWrap"><div id="joyBase"><span class="ja ja-u"></span><span class="ja ja-d"></span><span class="ja ja-l"></span><span class="ja ja-r"></span><div id="joyKnob"></div></div></div>
   <button id="mobMenuBtn">☰</button>
 
   <div id="mobMenu">
@@ -1518,32 +1529,59 @@ function initMobileMenu(){
 function drawMarkers(){
   if(!IS_MOBILE||!entered)return;
   const M=[
-    {x:HAT_OBJ.x,y:HAT_OBJ.y-42,e:'🎩'},
-    {x:CAL_OBJ.x,y:CAL_OBJ.y-36,e:'📅'},
-    {x:LB_OBJ.x+16,y:LB_OBJ.y-58,e:'🥇'},
+    {x:HAT_OBJ.x,y:HAT_OBJ.y-82,e:'🎩'},
+    {x:CAL_OBJ.x,y:CAL_OBJ.y-46,e:'📅'},
+    {x:LB_OBJ.x+17,y:LB_OBJ.y-70,e:'🥇'},
     {x:PM.x+PM.w/2,y:PM.y+PM.h+42,e:phase==='pitch'?'📝':'⚡'},
     {x:SBZONE.x+18,y:SBZONE.y-16,e:'🎪'},
     {x:GRANDC.x,y:GRAND.y-28,e:'✦'},
   ];
   CHESTS.forEach(c=>M.push({x:c.x,y:c.y-36,e:({open:'🎁',day2:'🔒',day3:'🔒',grad:'🎓',gold:'👑',mystery:'❓'})[c.type]}));
-  PEDS.forEach(p=>M.push({x:p.x,y:p.y-48,e:'🏆'}));
-  if(vipUnlocked)M.push({x:CLOSET.x+CLOSET.w/2,y:CLOSET.y-18,e:'👗'});
+  PEDS.forEach(p=>M.push({x:p.x,y:p.y-114,e:'🏆'}));
+  if(vipUnlocked)M.push({x:CLOSET.x+CLOSET.w/2,y:CLOSET.y-30,e:'👗'});
+  // which marker is armed? the one nearest the player while an action is pending
+  let armed=-1;
+  if(ctxAction){
+    let best=150;
+    M.forEach((m,i)=>{const d=dist(player.x,player.y,m.x,m.y);if(d<best){best=d;armed=i;}});
+    ctxAnchor=armed>=0?{x:M[armed].x,y:M[armed].y}:null;
+  }else ctxAnchor=null;
   M.forEach((m,i)=>{
-    const y=m.y+Math.sin(elapsed*2.6+i*1.3)*4;
-    ctx.fillStyle='rgba(8,26,20,.78)';
-    ctx.beginPath();ctx.arc(m.x,y,13,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(249,200,94,.75)';ctx.lineWidth=1.6;
-    ctx.beginPath();ctx.arc(m.x,y,13,0,Math.PI*2);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(m.x-4,y+11);ctx.lineTo(m.x+4,y+11);ctx.lineTo(m.x,y+19);ctx.closePath();
-    ctx.fillStyle='rgba(8,26,20,.78)';ctx.fill();
-    ctx.font='13px "Lato"';ctx.textAlign='center';ctx.textBaseline='middle';
+    const hot=i===armed;
+    const y=m.y+Math.sin(elapsed*2.6+i*1.3)*(hot?2:4);
+    const r=hot?20:13;
+    ctx.fillStyle=hot?'rgba(8,26,20,.92)':'rgba(8,26,20,.78)';
+    ctx.beginPath();ctx.arc(m.x,y,r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=hot?'#F9C85E':'rgba(249,200,94,.75)';ctx.lineWidth=hot?2.4:1.6;
+    ctx.beginPath();ctx.arc(m.x,y,r,0,Math.PI*2);ctx.stroke();
+    if(hot){
+      const pw=0.35+0.25*Math.sin(elapsed*4);
+      ctx.strokeStyle=`rgba(249,200,94,${pw})`;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(m.x,y,r+6,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.beginPath();ctx.moveTo(m.x-4,y+r-2);ctx.lineTo(m.x+4,y+r-2);ctx.lineTo(m.x,y+r+6);ctx.closePath();
+    ctx.fillStyle=hot?'rgba(8,26,20,.92)':'rgba(8,26,20,.78)';ctx.fill();
+    ctx.font=(hot?'18px':'13px')+' "Lato"';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#F9C85E';ctx.fillText(m.e,m.x,y+1);
     ctx.textBaseline='alphabetic';
+    if(hot){
+      const t='TAP TO OPEN';
+      ctx.font='700 10px "Montserrat"';
+      const tw=ctx.measureText(t).width+18;
+      ctx.fillStyle='#F9C85E';
+      ctx.beginPath();ctx.roundRect(m.x-tw/2,y-r-26,tw,18,9);ctx.fill();
+      ctx.fillStyle='#241E10';ctx.fillText(t,m.x,y-r-16.5);
+    }
   });
 }
-/* interactables announce themselves with floating markers; walking up opens the popup */
-function proxOffer(label,fn){fn();}
-function proxClear(){}
+/* mobile: walking up arms the nearest marker (grows + TAP TO OPEN); tapping it opens.
+   desktop: popups still open on walk-up. */
+let ctxAnchor=null;
+function proxOffer(label,fn){
+  if(!IS_MOBILE){fn();return;}
+  ctxAction=fn;
+}
+function proxClear(){ctxAction=null;ctxAnchor=null;}
 function setNavMode(m){
   navMode=m;
   $('game').classList.toggle('menumode',m==='menu');
@@ -1583,6 +1621,7 @@ function startGame(name,skin,gender='m'){
   window.addEventListener('keyup',e=>{if(typing(e))return;keys[e.key.toLowerCase()]=false;});
   function handleTap(wx,wy,walkOk){
     if(transitioning||vidOpen)return;
+    if(IS_MOBILE&&ctxAction&&ctxAnchor&&dist(wx,wy,ctxAnchor.x,ctxAnchor.y)<46){ctxAction();return;}
     if(entered){
       const qbH=questCollapsed?QB.hMin:QB.hFull;
       if(wx>QB.x-10&&wx<QB.x+QB.w+10&&wy>QB.y-10&&wy<QB.y+qbH+14){
