@@ -269,7 +269,11 @@
   #bigClose{display:none;position:sticky;bottom:-14px;width:100%;margin-top:14px;background:var(--gold);color:#241E10;font-size:15px;font-weight:800;padding:14px;border-radius:12px;border:2px solid #B8871E;box-shadow:0 -6px 18px rgba(0,0,0,.15);text-align:center;z-index:5}
   #bigClose.on{display:block}
   #bigClose:active{transform:scale(.97)}
-  #tutCap{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%) scale(.94);z-index:16;font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:.08em;color:var(--gold);text-align:center;text-shadow:0 3px 14px rgba(0,0,0,.85),0 0 34px rgba(249,200,94,.35);opacity:0;transition:opacity .45s,transform .45s;pointer-events:none;max-width:86vw;line-height:1.35}
+  #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:var(--gold);color:#241E10;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #B8871E;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
+  #tapOpenBtn.on{display:block}
+  #tapOpenBtn:active{transform:translateX(-50%) scale(.95)}
+  @keyframes ctxPulse{0%,100%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.4)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
+  #tutCap{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%) scale(.94);z-index:16;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.07em;color:var(--gold);text-align:center;background:rgba(6,14,10,.92);border:2px solid rgba(249,200,94,.55);border-radius:16px;padding:16px 22px;box-shadow:0 14px 44px rgba(0,0,0,.6);opacity:0;transition:opacity .45s,transform .45s;pointer-events:none;max-width:84vw;line-height:1.4}
   #tutCap.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
@@ -408,6 +412,7 @@
   <button id="mobMenuBtn">☰</button>
   <button id="bigClose">✕ &nbsp;Close this tab</button>
   <div id="tutCap"></div>
+  <button id="tapOpenBtn">Tap to open</button>
 
   <div id="mobMenu">
     <div class="nav-head">
@@ -998,6 +1003,7 @@ function hideCap(){$('tutCap').classList.remove('on');}
 const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','profileCard','hofCard','bonusPanel'];
 function updateBigClose(){
   if(!IS_MOBILE)return;
+  $('tapOpenBtn').classList.toggle('on',!!ctxAction&&!CLOSE_WATCH.some(id=>$(id).classList.contains('show')));
   const btn=$('bigClose');
   const openId=CLOSE_WATCH.find(id=>$(id).classList.contains('show'));
   if(!openId){btn.classList.remove('on');return;}
@@ -1476,6 +1482,7 @@ function renderNav(){
   });
 }
 function teleportTo(d){
+  if(tut){toast('🧭 Finish the orientation first — walk to the sorting hat',2600);return;}
   if(d.vip&&!vipUnlocked){toast('🔒 The VIP Lounge unlocks when you apply for a strategy call');blip(220,0.12,'square',0.1);return;}
   if(lockdown&&!(inRoom('mainStage',d.x,d.y)||inRoom('treasure',d.x,d.y))){
     toast('🔒 Doors are locked until the training ends');return;}
@@ -1546,6 +1553,16 @@ function initMobileMenu(){
   $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
   $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
 }
+/* during the tutorial, rooms you haven't been introduced to are blacked out */
+function drawTutMask(){
+  const stageKnown=tut.phase!=='move'&&tut.phase!=='panRoom';
+  ROOMS.forEach(r=>{
+    if(r.id==='lobby')return;
+    if(r.id==='mainStage'&&stageKnown)return;
+    ctx.fillStyle='rgba(4,8,6,.97)';
+    ctx.fillRect(r.x-8,r.y-8,r.w+16,r.h+16);
+  });
+}
 /* guided-intro: marching ground chevrons from the player to the sorting hat + pulsing ring */
 function drawTutArrow(){
   const hx=HAT_OBJ.x,hy=HAT_OBJ.y;
@@ -1604,14 +1621,6 @@ function drawMarkers(){
     ctx.font=(hot?'18px':'13px')+' "Lato"';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#F9C85E';ctx.fillText(m.e,m.x,y+1);
     ctx.textBaseline='alphabetic';
-    if(hot){
-      const t='TAP TO OPEN';
-      ctx.font='700 10px "Montserrat"';
-      const tw=ctx.measureText(t).width+18;
-      ctx.fillStyle='#F9C85E';
-      ctx.beginPath();ctx.roundRect(m.x-tw/2,y-r-26,tw,18,9);ctx.fill();
-      ctx.fillStyle='#241E10';ctx.fillText(t,m.x,y-r-16.5);
-    }
   });
 }
 /* mobile: walking up arms the nearest marker (grows + TAP TO OPEN); tapping it opens.
@@ -1743,6 +1752,7 @@ function startGameInputs(name){
     questCollapsed=true;
     initMobileMenu();
     $('bigClose').onclick=()=>{CLOSE_WATCH.forEach(id=>$(id).classList.remove('show'));blip(520,0.05,'sine',0.06);};
+    $('tapOpenBtn').onclick=()=>{if(ctxAction)ctxAction();};
   }
   updateBonusChip();
   $('bonusChip').onclick=()=>{const p=$('bonusPanel');
@@ -1840,17 +1850,18 @@ function update(dt){
   updateBigClose();
   if(tut){
     tut.t+=dt;
+    const pan=(to,dur)=>{tut.from={x:cam.cx,y:cam.cy};tut.to=to;tut.dur=dur;};
     if(tut.phase==='move'){
       if(player.y<tut.startY-70){
-        tut.phase='panRoom';tut.t=0;tut.cinema=true;tut.cam={x:240,y:1700};
+        tut.phase='panRoom';tut.t=0;tut.cinema=true;pan({x:240,y:1700},1.7);
         setCap('THIS IS THE MAIN ROOM');sfxChime&&sfxChime();
       }
     }else if(tut.phase==='panRoom'){
-      if(tut.t>2.4){tut.phase='panStage';tut.t=0;tut.cam={x:240,y:1010};setCap('THIS IS THE MAIN STAGE');}
+      if(tut.t>2.9){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},2.1);setCap('THIS IS THE MAIN STAGE');}
     }else if(tut.phase==='panStage'){
-      if(tut.t>2.6){tut.phase='returnP';tut.t=0;tut.cam=null;hideCap();}
+      if(tut.t>3.4){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.6);hideCap();}
     }else if(tut.phase==='returnP'){
-      if(tut.t>1.3){tut.phase='hat';tut.t=0;tut.cinema=false;setCap('START HERE —<br>WALK TO THE SORTING HAT');}
+      if(tut.t>1.7){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('START HERE —<br>WALK TO THE SORTING HAT');}
     }else if(tut.phase==='hat'){
       if(dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62)){
         hideCap();tut=null;
@@ -2020,13 +2031,20 @@ function update(dt){
   /* ---- eased camera + gentle pitch zoom ---- */
   const zt=(phase==='pitch'?1.07:1)*zoomFit;
   zoom+=(zt-zoom)*Math.min(1,dt*3);
-  const [tcx,tcy]=camTarget();
-  cam.cx+=(tcx-cam.cx)*Math.min(1,dt*6);
-  cam.cy+=(tcy-cam.cy)*Math.min(1,dt*6);
+  if(tut&&tut.cinema&&tut.from){
+    const p=clamp(tut.t/tut.dur,0,1);
+    const e=p<0.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;   // easeInOutCubic
+    cam.cx=tut.from.x+(tut.to.x-tut.from.x)*e;
+    cam.cy=tut.from.y+(tut.to.y-tut.from.y)*e;
+  }else{
+    const [tcx,tcy]=camTarget();
+    cam.cx+=(tcx-cam.cx)*Math.min(1,dt*6);
+    cam.cy+=(tcy-cam.cy)*Math.min(1,dt*6);
+  }
 }
 function camTarget(){
   if(!entered){const r=ROOM.mud;return[r.x+r.w/2,r.y+r.h/2];}
-  if(tut&&tut.cam)return[tut.cam.x,tut.cam.y];
+
   const minX=WORLD.minX,maxX=WORLD.maxX,minY=WORLD.minY,maxY=WORLD.maxY;
   const hw=vw/(2*zoom),hh=vh/(2*zoom);
   const x=(maxX-minX<=2*hw)?(minX+maxX)/2:clamp(player.x,minX+hw,maxX-hw);
@@ -2177,6 +2195,7 @@ function render(){
     drawPill(vipUnlocked?'VIP ENTRANCE ✦':'VIP ENTRANCE 🔒',VIPDOOR.x,VIPDOOR.pillY,!vipUnlocked);
     drawMarkers();
     if(tut&&tut.phase==='hat')drawTutArrow();
+    if(tut)drawTutMask();
 
     drawPuffs();
     [...npcs,player].sort((a,b)=>a.y-b.y).forEach(c=>{
