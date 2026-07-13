@@ -1168,7 +1168,7 @@ function chatBurst(lines){
   lines.forEach((t,i)=>{const n=npcs[(Math.random()*npcs.length)|0];setTimeout(()=>postChat(n,t),i*900);});
 }
 function chatTick(dt){
-  if(!entered)return;
+  if(!entered||!npcs.length)return;
   chatTimer-=dt;
   if(chatTimer<=0){
     chatTimer=rand(4,9);
@@ -1650,7 +1650,7 @@ function startGame(name,skin,gender='m'){
     tut={phase:'move',t:0,cinema:false,startY:player.y};
     setTimeout(()=>setCap('MOVE YOUR THUMB UP&nbsp; ↑'),600);
   }
-  startGameInputs();
+  startGameInputs(name);
 }
 function spawnNpcs(){
   npcs=[];
@@ -1670,7 +1670,7 @@ function spawnNpcs(){
   }
   $('attendeeCount').textContent=npcs.length+1;
 }
-function startGameInputs(){
+function startGameInputs(name){
   const typing=e=>e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA');
   window.addEventListener('keydown',e=>{if(typing(e)){keys={};return;}keys[e.key.toLowerCase()]=true;
     if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();});
