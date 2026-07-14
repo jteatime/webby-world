@@ -320,8 +320,12 @@
   #game.mobile #stageBar.show{transform:translateY(0)}
   #game.mobile.stagebar #mobRail{bottom:calc(250px + env(safe-area-inset-bottom,0px))}
   #game.mobile.stagebar #tapOpenBtn{top:auto;bottom:calc(160px + env(safe-area-inset-bottom,0px))}
-  #game.mobile #stageBar .sb-label{width:100%;text-align:center;font-size:12.5px;letter-spacing:.2em}
-  #game.mobile #stageBar button{flex:1;font-size:15px;font-weight:800;padding:17px 10px;border-radius:15px}
+  .sb-sub{display:none}
+  #game.mobile #stageBar{flex-direction:column;align-items:stretch}
+  #game.mobile #stageBar .sb-dot{display:none}
+  #game.mobile #stageBar .sb-label{width:100%;text-align:center;font-size:13px;letter-spacing:.2em}
+  #game.mobile #stageBar .sb-sub{display:block;width:100%;text-align:center;font-size:12px;color:#CFE3D6;margin-top:-4px}
+  #game.mobile #stageBar button{width:100%;font-size:15.5px;font-weight:800;padding:17px 10px;border-radius:15px}
   /* toasts read from the top on mobile — thumbs cover the bottom */
   #game.mobile #toast{top:auto;bottom:calc(176px + env(safe-area-inset-bottom,0px))}
   #game.mobile #toast.raised{top:auto;bottom:calc(250px + env(safe-area-inset-bottom,0px))}
@@ -413,8 +417,9 @@
 
   <div id="stageBar">
     <span class="sb-dot"></span><span class="sb-label">THE PRESENTATION IS LIVE</span>
-    <button id="fullBtn">▶ WATCH FULL SCREEN</button>
+    <span class="sb-sub">Click below to watch now</span>
     <button id="theaterBtn">🎭 THEATER VIEW</button>
+    <button id="fullBtn">▶ FULL SCREEN</button>
   </div>
 
   <div id="lockBanner">
@@ -1945,14 +1950,12 @@ function update(dt){
     }else if(tut.phase==='panStage'){
       if(tut.t>1.6){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.1);hideCap();}
     }else if(tut.phase==='returnP'){
-      if(tut.t>1.3){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('<span style="display:block;color:#F7F3E3;font-size:12px;letter-spacing:.14em;margin-bottom:5px">START HERE</span>WALK TO THE SORTING HAT');}
-    }else if(tut.phase==='hat'){
-      if(dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62)){
+      if(tut.t>1.3){
         hideCap();tut=null;
         $('game').classList.remove('tutorial');
         spawnNpcs();               // spawned, but hidden until the tour's reveal
         onEventEntered();
-        tour={step:'map',opened:false};tourStep();hideCap();
+        tour={step:'map',opened:false};tourStep();
       }
     }
   }
@@ -2282,7 +2285,6 @@ function render(){
     });
     drawPill(vipUnlocked?'VIP ENTRANCE ✦':'VIP ENTRANCE 🔒',VIPDOOR.x,VIPDOOR.pillY,!vipUnlocked);
     drawMarkers();
-    if(tut&&tut.phase==='hat')drawTutArrow();
     if(tut)drawTutMask();
 
     drawPuffs();
