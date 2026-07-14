@@ -187,7 +187,7 @@
   #game.mobile .panel p{font-size:12.5px}
   #game.mobile .panel .btn-cta{font-size:13.5px;padding:10px;margin-top:10px}
   #game.mobile .res-row{padding:8px 10px;margin-top:9px}
-  #game.mobile #chatPanel{left:0;right:0;bottom:0;width:auto;height:56vh;border-radius:20px 20px 0 0;border:none;border-top:2px solid #2E5A48;transform:translateY(105%);transform-origin:bottom center;z-index:34}
+  #game.mobile #chatPanel{left:0;right:0;bottom:0;width:auto;height:34vh;border-radius:20px 20px 0 0;border:none;border-top:2px solid #2E5A48;transform:translateY(105%);transform-origin:bottom center;z-index:34}
   #game.mobile #chatPanel.show{transform:translateY(0)}
   .panel .p-eyebrow{font-family:var(--pixel);font-size:10px;letter-spacing:2px;color:#A0752B;margin-bottom:6px}
   .panel h3{font-family:var(--display);font-size:20px;line-height:1.15;margin-bottom:8px}
@@ -277,6 +277,8 @@
   @keyframes ctxPulse{0%,100%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.4)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
   #tutCap{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.94);z-index:16;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.07em;color:var(--gold);text-align:center;background:rgba(6,14,10,.92);border:2px solid rgba(249,200,94,.55);border-radius:16px;padding:16px 22px;box-shadow:0 14px 44px rgba(0,0,0,.6);opacity:0;transition:opacity .45s,transform .45s;pointer-events:none;max-width:84vw;line-height:1.4}
   #tutCap.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #tutCap.low{top:58%}
+  .rail-btn.pulse{border-color:#F9C85E;animation:ctxPulse 1.6s infinite}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
   #game.mobile.tutorial #joyWrap{display:block}
@@ -318,9 +320,9 @@
   #game.mobile #stageBar .sb-label{font-size:10.5px;letter-spacing:.14em}
   #game.mobile #stageBar button{font-size:11px;padding:8px 11px}
   /* toasts read from the top on mobile — thumbs cover the bottom */
-  #game.mobile #toast{bottom:auto;top:calc(118px + env(safe-area-inset-top,0px))}
+  #game.mobile #toast{top:auto;bottom:calc(176px + env(safe-area-inset-bottom,0px))}
   #game.mobile #toast.raised{bottom:auto}
-  #game.mobile.mudmode #toast{bottom:auto;top:calc(118px + env(safe-area-inset-top,0px));font-size:14px;padding:12px 18px}
+  #game.mobile.mudmode #toast{top:auto;bottom:calc(176px + env(safe-area-inset-bottom,0px));font-size:14px;padding:12px 18px}
   #navSheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5);max-height:72vh;overflow-y:auto}
   #navSheet.show{transform:translateY(0)}
   .nav-head{display:flex;align-items:center;justify-content:space-between}
@@ -1000,8 +1002,28 @@ let puffs=[];
 let keys={},tapTarget=null;
 /* ---------- mobile + device-bonus state ---------- */
 let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null,hideNpcs=false;
-let tut=null;
-function setCap(html){const c=$('tutCap');c.innerHTML=html;c.classList.add('on');}
+let tut=null,tour=null;
+function setCap(html,low){const c=$('tutCap');c.innerHTML=html;c.classList.add('on');c.classList.toggle('low',!!low);}
+function tourStep(){
+  ['railMap','railChat','railHide'].forEach(id=>$(id).classList.remove('pulse'));
+  if(!tour)return;
+  if(tour.step==='map'){setCap('🗺️ THIS IS THE MAP —<br>TAP IT, THEN CLOSE IT',true);$('railMap').classList.add('pulse');}
+  else if(tour.step==='chat'){setCap('💬 THIS IS THE LIVE CHAT —<br>OPEN IT, THEN CLOSE IT',true);$('railChat').classList.add('pulse');}
+  else if(tour.step==='hide'){setCap('👥 NOW TAP TO REVEAL<br>THE OTHER ATTENDEES',true);$('railHide').classList.add('pulse');}
+}
+function tourUpdate(){
+  if(!tour)return;
+  if(tour.step==='map'){
+    const open=$('navSheet').classList.contains('show');
+    if(open)tour.opened=true;
+    if(tour.opened&&!open){tour={step:'chat',opened:false};tourStep();}
+  }else if(tour.step==='chat'){
+    if(chatOpen)tour.opened=true;
+    if(tour.opened&&!chatOpen){tour={step:'hide'};tourStep();}
+  }else if(tour.step==='hide'){
+    if(!hideNpcs){tour=null;tourStep();hideCap();toast('🌿 Welcome to Webby World — enjoy the event',3200);}
+  }
+}
 function hideCap(){$('tutCap').classList.remove('on');}
 const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','profileCard','hofCard','bonusPanel'];
 function updateBigClose(){
@@ -1542,7 +1564,8 @@ function initFloatingStick(){
 function initMobileRail(){
   $('railMap').onclick=()=>{renderNav();$('navSheet').classList.add('show');blip(760,0.05,'sine',0.06);};
   $('railChat').onclick=()=>$('chatToggle').onclick();
-  $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
+  $('railHide').textContent=hideNpcs?'🙈':'👥';
+  $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';if(!tour)toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
   $('mobDemoBtn').onclick=()=>$('demoBtn').click();
 }
 /* during the tutorial, rooms you haven't been introduced to are blacked out */
@@ -1652,6 +1675,7 @@ function startGame(name,skin,gender='m'){
     $('game').classList.remove('mudmode');$('game').classList.add('entered');
     $('mudChip').style.display='none';$('hint').style.opacity=0;
     sbSeen=true;   // no Stage B on the mobile map
+    hideNpcs=true;   // world starts quiet; the tour's last step reveals the crowd
     tut={phase:'move',t:0,cinema:false,startY:player.y};
     setTimeout(()=>setCap('MOVE YOUR THUMB UP&nbsp; ↑'),600);
   }
@@ -1703,8 +1727,14 @@ function startGameInputs(name){
   else initFloatingStick();
 
   $('demoBtn').onclick=()=>{if(phase==='lobby')startWebinar();else if(phase==='webinar')startPitch();};
-  $('fullBtn').onclick=()=>openVideo('screen');
-  $('theaterBtn').onclick=()=>openVideo('theater');
+  const watchFrom=(mode)=>{
+    if(IS_MOBILE&&!inRoom('mainStage',player.x,player.y)){
+      teleportTo({e:'🎤',name:'Main Stage',x:240,y:1000});
+    }
+    openVideo(mode);
+  };
+  $('fullBtn').onclick=()=>watchFrom('screen');
+  $('theaterBtn').onclick=()=>watchFrom('theater');
   $('vidClose').onclick=closeVideo;
   $('vidPlay').onclick=()=>{if(videoOk){vid.paused?vid.play():vid.pause();$('vidPlay').textContent=vid.paused?'▶':'❚❚';}else{vidPlaying=!vidPlaying;$('vidPlay').textContent=vidPlaying?'❚❚':'▶';}};
   $('vidModeBtn').onclick=()=>setVidMode(vidMode==='screen'?'theater':'screen');
@@ -1846,28 +1876,28 @@ function sizeTheater(){
 function loop(ts){const dt=Math.min(0.05,(ts-lastTs)/1000);lastTs=ts;elapsed+=dt;update(dt);render();if(vidOpen)updateVideo(dt);requestAnimationFrame(loop);}
 
 function update(dt){
-  updateBigClose();
+  updateBigClose();tourUpdate();
   if(tut){
     tut.t+=dt;
     const pan=(to,dur)=>{tut.from={x:cam.cx,y:cam.cy};tut.to=to;tut.dur=dur;};
     if(tut.phase==='move'){
       if(player.y<tut.startY-70){
-        tut.phase='panRoom';tut.t=0;tut.cinema=true;pan({x:240,y:1700},1.7);
+        tut.phase='panRoom';tut.t=0;tut.cinema=true;pan({x:240,y:1700},1.2);
         setCap('THIS IS THE MAIN ROOM');sfxChime&&sfxChime();
       }
     }else if(tut.phase==='panRoom'){
-      if(tut.t>2.9){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},2.1);setCap('THIS IS THE MAIN STAGE');}
+      if(tut.t>2.0){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},1.5);setCap('THIS IS THE MAIN STAGE');}
     }else if(tut.phase==='panStage'){
-      if(tut.t>3.4){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.6);hideCap();}
+      if(tut.t>2.4){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.1);hideCap();}
     }else if(tut.phase==='returnP'){
-      if(tut.t>1.7){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('START HERE —<br>WALK TO THE SORTING HAT');}
+      if(tut.t>1.3){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('START HERE —<br>WALK TO THE SORTING HAT');}
     }else if(tut.phase==='hat'){
       if(dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62)){
         hideCap();tut=null;
         $('game').classList.remove('tutorial');
-        spawnNpcs();
+        spawnNpcs();               // spawned, but hidden until the tour's reveal
         onEventEntered();
-        toast('🌿 The lobby fills in around you — welcome to Webby World',3600);
+        tour={step:'map',opened:false};tourStep();
       }
     }
   }
@@ -2022,7 +2052,7 @@ function update(dt){
     $('stagebCountdown').textContent=fmtCountdown(STAGEB_DATE-Date.now());
 
   /* ---- fullscreen buttons near the stage ---- */
-  const ns=entered&&player.x>STAGEZONE.x&&player.x<STAGEZONE.x+STAGEZONE.w&&player.y>STAGEZONE.y&&player.y<STAGEZONE.y+STAGEZONE.h;
+  const ns=entered&&((IS_MOBILE&&phase!=='lobby')||(player.x>STAGEZONE.x&&player.x<STAGEZONE.x+STAGEZONE.w&&player.y>STAGEZONE.y&&player.y<STAGEZONE.y+STAGEZONE.h));
   if(ns!==nearStage){nearStage=ns;$('stageBar').classList.toggle('show',ns);$('game').classList.toggle('stagebar',ns);$('toast').classList.toggle('raised',ns);}
 
   updateNPCs(dt);
