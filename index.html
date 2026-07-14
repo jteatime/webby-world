@@ -426,6 +426,7 @@
     <button class="rail-btn" id="railMap" style="position:relative">🗺️</button>
     <button class="rail-btn" id="railChat" style="position:relative">💬<span class="rb-badge" id="railChatBadge"></span></button>
     <button class="rail-btn" id="railHide" style="position:relative">👥</button>
+    <button class="rail-btn" id="railProfile" style="position:relative">👤</button>
   </div>
   <button id="bigClose">✕ &nbsp;Close this tab</button>
   <div id="tutCap"></div>
@@ -1259,7 +1260,7 @@ function renderSort(){
 /* ---------- profile card ---------- */
 function openProfile(c){
   $('pcArch').textContent=c.archetype?(c.archetype.emoji+' '+c.archetype.name.toUpperCase()):'🎩 NOT YET SORTED';
-  $('pcName').textContent=c.name+(c===player?' (you)':'')+(c.badges&&c.badges.includes('VIP')?' · 🛡️ VIP':'');
+  $('pcName').textContent=c.name+' · LV '+(c.level||1)+(c===player?' (you)':'')+(c.badges&&c.badges.includes('VIP')?' · 🛡️ VIP':'');
   const pr=c.profile||{};
   $('pcBiz').textContent=pr.biz?('💼 '+pr.biz):'';
   $('pcHope').textContent=pr.hope?('🎯 Hoping for: '+pr.hope):'';
@@ -1566,6 +1567,7 @@ function initMobileRail(){
   $('railChat').onclick=()=>$('chatToggle').onclick();
   $('railHide').textContent=hideNpcs?'🙈':'👥';
   $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';if(!tour)toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
+  $('railProfile').onclick=()=>openProfile(player);
   $('mobDemoBtn').onclick=()=>$('demoBtn').click();
 }
 /* during the tutorial, rooms you haven't been introduced to are blacked out */
