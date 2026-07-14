@@ -163,7 +163,7 @@
   #lockBanner .lb-s{font-size:13px;color:var(--muted);margin-top:4px}
 
   #hint{position:absolute;left:50%;transform:translateX(-50%);bottom:96px;background:rgba(8,26,20,.9);border:1px solid #2E5A48;border-radius:12px;padding:10px 16px;font-size:13px;color:var(--muted);pointer-events:none;transition:opacity .5s;text-align:center;max-width:88vw}
-  #toast{position:absolute;left:50%;transform:translateX(-50%);bottom:150px;background:#AEBE37;color:#16240E;font-weight:800;font-size:13.5px;border-radius:12px;padding:11px 16px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:min(360px,80vw);text-align:center;z-index:20;box-shadow:0 10px 28px rgba(0,0,0,.45);border:1px solid #8FA02C}
+  #toast{position:absolute;left:50%;transform:translateX(-50%);bottom:150px;background:rgba(6,14,10,.93);color:#F7F3E3;font-weight:800;font-size:13.5px;border-radius:14px;padding:13px 18px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:min(360px,80vw);text-align:center;z-index:20;box-shadow:0 14px 40px rgba(0,0,0,.55);border:2px solid rgba(174,190,55,.75)}
   #toast.world{left:14px;transform:none;bottom:76px;text-align:left;max-width:min(320px,70vw)}
   #toast.world.raised{bottom:158px}
   /* mud-room minimalism: orientation + welcome only, both enlarged */
@@ -266,10 +266,10 @@
   /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
-  #bigClose{display:none;position:sticky;bottom:-14px;width:100%;margin-top:14px;background:var(--gold);color:#241E10;font-size:15px;font-weight:800;padding:14px;border-radius:12px;border:2px solid #B8871E;box-shadow:0 -6px 18px rgba(0,0,0,.15);text-align:center;z-index:5}
+  #bigClose{display:none;position:fixed;left:50%;transform:translateX(-50%);z-index:15;background:#C6362B;color:#fff;font-size:13.5px;font-weight:800;padding:11px 22px;border-radius:13px;border:2px solid #8E241C;box-shadow:0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
   #bigClose.on{display:block}
-  #bigClose:active{transform:scale(.97)}
-  #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:var(--gold);color:#241E10;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #B8871E;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
+  #bigClose:active{transform:translateX(-50%) scale(.94)}
+  #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:#569241;color:#fff;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #3B6D2A;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
   #tapOpenBtn.on{display:block}
   #tapOpenBtn:active{transform:translateX(-50%) scale(.95)}
   @keyframes ctxPulse{0%,100%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.4)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
@@ -878,9 +878,9 @@ const ROOMS=IS_MOBILE?[
   {id:'mud', name:'Welcome Grove', x:40,y:3000,w:400,h:460, floor:'#2E3A2E', top:'#4E6B50', wall:'#1C241C', stone:true, doors:{top:[[190,290]]}},
   {id:'hof', name:'Hall of Fame', x:40,y:2040,w:400,h:520, floor:'#33402E', top:'#5E7A50', wall:'#1E2818', stone:true, doors:{top:[[190,290]]}},
   {id:'lobby', name:'Lobby', x:40,y:1420,w:400,h:620, floor:'#4E523A', top:'#7A805A', wall:'#2C3020', stone:true, doors:{top:[[190,290]], bottom:[[190,290]]}},
-  {id:'mainStage', name:'Main Stage', x:40,y:780,w:400,h:640, floor:'#161E14', top:'#C9A24A', wall:'#0F140C', lux:true, doors:{top:[[330,410]], bottom:[[190,290]]}},
-  {id:'treasure', name:'Treasure Room', x:40,y:360,w:400,h:420, floor:'#57482E', top:'#8A7550', wall:'#382D1C', stone:true, doors:{top:[[190,290]], bottom:[[330,410]]}},
-  {id:'vip', name:'VIP Lounge', x:40,y:60,w:400,h:300, floor:'#0D3A33', top:'#0D7464', wall:'#082622', doors:{bottom:[[190,290]]}},
+  {id:'mainStage', name:'Main Stage', x:40,y:780,w:400,h:640, floor:'#161E14', top:'#C9A24A', wall:'#0F140C', lux:true, doors:{bottom:[[190,290]], right:[[960,1060]]}},
+  {id:'treasure', name:'Treasure Room', x:440,y:880,w:400,h:420, floor:'#57482E', top:'#8A7550', wall:'#382D1C', stone:true, doors:{left:[[960,1060]], top:[[560,660]]}},
+  {id:'vip', name:'VIP Lounge', x:440,y:580,w:400,h:300, floor:'#0D3A33', top:'#0D7464', wall:'#082622', doors:{bottom:[[560,660]]}},
 ]:[
   {id:'mud', name:'Welcome Grove', x:60,y:880,w:560,h:420, floor:'#2E3A2E', top:'#4E6B50', wall:'#1C241C', stone:true, doors:{}},
   {id:'hof', name:'Hall of Fame', x:100,y:380,w:400,h:460, floor:'#33402E', top:'#5E7A50', wall:'#1E2818', stone:true, doors:{right:[[560,680]]}},
@@ -916,20 +916,20 @@ function buildWalls(){
 }
 
 /* furniture + zones */
-const STAGE=IS_MOBILE?{x:70,y:830,w:240,h:100}:{x:1290,y:290,w:420,h:120};
+const STAGE=IS_MOBILE?{x:70,y:830,w:340,h:100}:{x:1290,y:290,w:420,h:120};
 const SCREEN={x:STAGE.x+34,y:STAGE.y+12,w:STAGE.w-68,h:76};
-const STAGEZONE=IS_MOBILE?{x:80,y:950,w:280,h:110}:{x:1330,y:426,w:340,h:110};
+const STAGEZONE=IS_MOBILE?{x:90,y:950,w:300,h:110}:{x:1330,y:426,w:340,h:110};
 // POWER MOVES desk
-const PM=IS_MOBILE?{x:244,y:440,w:150,h:46}:{x:1430,y:1140,w:200,h:58};
-const PMZONE=IS_MOBILE?{x:230,y:490,w:176,h:76}:{x:1424,y:1098,w:212,h:86};
+const PM=IS_MOBILE?{x:664,y:964,w:140,h:44}:{x:1430,y:1140,w:200,h:58};
+const PMZONE=IS_MOBILE?{x:650,y:1014,w:164,h:66}:{x:1424,y:1098,w:212,h:86};
 // six treasure chests (aisle kept clear from the door to the desk)
 const CHESTS=IS_MOBILE?[
-  {x:110,y:620,type:'open', label:'BONUSES'},
-  {x:180,y:620,type:'day2', label:'DAY 2'},
-  {x:250,y:620,type:'day3', label:'DAY 3'},
-  {x:320,y:620,type:'grad', label:'GRADUATION'},
-  {x:310,y:710,type:'gold', label:'GOLDEN'},
-  {x:150,y:710,type:'mystery', label:'MYSTERY'},
+  {x:510,y:1150,type:'open', label:'BONUSES'},
+  {x:600,y:1150,type:'day2', label:'DAY 2'},
+  {x:690,y:1150,type:'day3', label:'DAY 3'},
+  {x:780,y:1150,type:'grad', label:'GRADUATION'},
+  {x:740,y:1236,type:'gold', label:'GOLDEN'},
+  {x:560,y:1236,type:'mystery', label:'MYSTERY'},
 ]:[
   {x:1352,y:1000,type:'open', label:'BONUSES'},
   {x:1418,y:1000,type:'day2', label:'DAY 2'},
@@ -940,7 +940,7 @@ const CHESTS=IS_MOBILE?[
 ];
 // stage B — full locked room on desktop; a locked door on the Main Stage wall on mobile
 const SB_PLAT=IS_MOBILE?null:{x:1920,y:440,w:260,h:80};
-const SBZONE=IS_MOBILE?{x:378,y:1150,w:36,h:100}:{x:1782,y:584,w:52,h:112};
+const SBZONE=IS_MOBILE?null:{x:1782,y:584,w:52,h:112};
 // mud room props
 const MUD_PAD=IS_MOBILE?{x:240,y:3190}:{x:340,y:1200};
 const MUD_DOOR_TRIGGER=IS_MOBILE?{x:186,y:3006,w:108,h:86}:{x:508,y:1118,w:84,h:154};
@@ -952,26 +952,26 @@ const PEDS=IS_MOBILE?[{x:140,y:2160},{x:340,y:2160},{x:140,y:2360},{x:340,y:2360
 // sorting hat, wall calendar, VIP closet, leaderboard
 const HAT_OBJ=IS_MOBILE?{x:150,y:1720}:{x:820,y:640};
 const CAL_OBJ=IS_MOBILE?{x:120,y:1500}:{x:704,y:404};
-const CLOSET=IS_MOBILE?{x:78,y:150,w:44,h:88}:{x:672,y:238,w:44,h:88};
+const CLOSET=IS_MOBILE?{x:478,y:640,w:44,h:88}:{x:672,y:238,w:44,h:88};
 const LB_OBJ=IS_MOBILE?{x:352,y:1830}:{x:1094,y:756};
 /* derived + layout-specific anchors */
 const GRAND={x:ROOM.vip.x+ROOM.vip.w/2-60,y:ROOM.vip.y+ROOM.vip.h/2,w:120,h:64};
 const GRANDC={x:GRAND.x+60,y:GRAND.y+46};
-const VIPDOOR=IS_MOBILE?{x:240,y:400,lockY:352,pillY:436}:{x:838,y:398,lockY:388,pillY:444};
-const VIPSEAL=IS_MOBILE?{x:184,y:330,w:112,h:56}:{x:766,y:350,w:128,h:60};
+const VIPDOOR=IS_MOBILE?{x:610,y:928,lockY:872,pillY:964}:{x:838,y:398,lockY:388,pillY:444};
+const VIPSEAL=IS_MOBILE?{x:554,y:850,w:112,h:56}:{x:766,y:350,w:128,h:60};
 const SBSEAL=IS_MOBILE?null:{x:1852,y:576,w:36,h:128};
 const CARPET=IS_MOBILE?{x:206,y:1292,w:68,h:128,horiz:false}:{x:918,y:592,w:222,h:68,horiz:true};
-const AISLE=IS_MOBILE?{x:344,y:500,w:60,h:254}:{x:1450,y:926,w:100,h:214};
-const LAMPS=IS_MOBILE?[{x:100,y:1500},{x:380,y:1500},{x:100,y:1960},{x:380,y:1960},{x:100,y:1140},{x:380,y:1140},{x:100,y:300},{x:380,y:300},{x:100,y:730},{x:380,y:560}]
+const AISLE=IS_MOBILE?{x:470,y:986,w:180,h:88}:{x:1450,y:926,w:100,h:214};
+const LAMPS=IS_MOBILE?[{x:100,y:1500},{x:380,y:1500},{x:100,y:1960},{x:380,y:1960},{x:100,y:1140},{x:380,y:1140},{x:500,y:620},{x:780,y:620},{x:500,y:944},{x:790,y:1244}]
                      :[{x:742,y:432},{x:918,y:432},{x:560,y:800},{x:1080,y:800},{x:1230,y:800},{x:1800,y:790},{x:748,y:336},{x:1000,y:320},{x:1350,y:1180},{x:1710,y:930},{x:1900,y:690},{x:2180,y:690}];
 const LSA=IS_MOBILE?{x:240,y:1460}:{x:1104,y:620};   // lobby-side of the lobby⇄stage doorway
 const LSB=IS_MOBILE?{x:240,y:1380}:{x:1188,y:620};   // stage-side
-const CROSS_ST=IS_MOBILE?{x:370,y:770}:{x:1490,y:888}; // stage⇄treasure crossing point
+const CROSS_ST=IS_MOBILE?{x:440,y:1010}:{x:1490,y:888}; // stage⇄treasure crossing point
 const NPC_LOBBY=IS_MOBILE?{x0:90,x1:390,y0:1470,y1:1990}:{x0:560,x1:1080,y0:440,y1:840};
 const NPC_STAGE=IS_MOBILE?{x0:90,x1:390,y0:970,y1:1370}:{x0:1200,x1:1780,y0:470,y1:820};
-const VIP_WPS=IS_MOBILE?[[319,540],[150,530],[150,420],[240,398]]
+const VIP_WPS=IS_MOBILE?[[730,1044],[610,1020],[610,926]]
                        :[[1530,1086],[1492,878],[1492,656],[1170,620],[988,600],[864,524],[830,436]];
-const QUEUE=IS_MOBILE?{y0:PM.y+PM.h+34,yEnd:588,dir:1}:{y0:PM.y-38,yEnd:940,dir:-1};
+const QUEUE=IS_MOBILE?{y0:PM.y+PM.h+34,yEnd:1108,dir:1}:{y0:PM.y-38,yEnd:940,dir:-1};
 
 let solids=[];
 function buildSolids(){
@@ -1009,7 +1009,8 @@ function updateBigClose(){
   if(!openId){btn.classList.remove('on');return;}
   const el=$(openId);
   const host=el.classList.contains('modal-bg')?(el.firstElementChild||el):el;
-  if(btn.parentNode!==host)host.appendChild(btn);
+  const rc=host.getBoundingClientRect();
+  btn.style.top=Math.min(rc.bottom-16,innerHeight-70)+'px';
   btn.classList.add('on');
 }
 let bonuses={entry:false,d1:false,d2:false};
@@ -1054,7 +1055,7 @@ const NPC_LINES=['anyone else from cold ads? lol','third time here, worth it','t
 // lobby ⇄ mainStage doorway handled via LSA/LSB layout anchors
 // keep-out circles so idle NPCs never stand on the interactive pieces
 const AVOID=IS_MOBILE
-  ?[[HAT_OBJ.x,HAT_OBJ.y,95],[CAL_OBJ.x,CAL_OBJ.y+14,70],[LB_OBJ.x,LB_OBJ.y,80],[SBZONE.x+18,SBZONE.y+50,80],[STAGE.x+STAGE.w/2,STAGE.y+STAGE.h+30,60]]
+  ?[[HAT_OBJ.x,HAT_OBJ.y,95],[CAL_OBJ.x,CAL_OBJ.y+14,70],[LB_OBJ.x,LB_OBJ.y,80],[STAGE.x+STAGE.w/2,STAGE.y+STAGE.h+30,60]]
   :[[820,640,95],[704,418,85],[838,400,85],[1094,756,85],[1815,640,90]];
 function pickSpot(x0,x1,y0,y1){
   let x=0,y=0;
@@ -1451,13 +1452,12 @@ const NAV_DESTS=IS_MOBILE?[
   {e:'🎤',name:'Main Stage',sub:'Where the training happens',x:240,y:1000},
   {e:'🌿',name:'Lobby',sub:'The heart of the world',x:240,y:1950},
   {e:'🏆',name:'Hall of Fame',sub:'Member wins & stories',x:240,y:2260},
-  {e:'💰',name:'Treasure Room',sub:'Chests & daily gifts',x:240,y:660},
+  {e:'💰',name:'Treasure Room',sub:'Chests & daily gifts',x:645,y:1100},
   {e:'🎩',name:'Sorting Hat',sub:'Find your archetype',x:150,y:1775},
-  {e:'⚡',name:'Power Moves Desk',sub:'Quiz → golden chest',x:318,y:540},
+  {e:'⚡',name:'Power Moves Desk',sub:'Quiz → golden chest',x:730,y:1046},
   {e:'📅',name:'Wall Calendar',sub:'Event schedule',x:120,y:1545},
   {e:'🥇',name:'Leaderboard',sub:'House rankings',x:352,y:1780},
-  {e:'🎪',name:'Stage B',sub:'RSVP the side session',x:395,y:1200},
-  {e:'👑',name:'VIP Lounge',sub:'Applicants only',x:240,y:300,vip:true},
+  {e:'👑',name:'VIP Lounge',sub:'Applicants only',x:640,y:830,vip:true},
 ]:[
   {e:'🎤',name:'Main Stage',sub:'Where the training happens',x:1500,y:500},
   {e:'🌿',name:'Lobby',sub:'The heart of the world',x:640,y:700},
@@ -1590,7 +1590,6 @@ function drawMarkers(){
     {x:CAL_OBJ.x,y:CAL_OBJ.y-46,e:'📅'},
     {x:LB_OBJ.x+17,y:LB_OBJ.y-70,e:'🥇'},
     {x:PM.x+PM.w/2,y:PM.y+PM.h+42,e:phase==='pitch'?'📝':'⚡'},
-    {x:SBZONE.x+18,y:SBZONE.y-16,e:'🎪'},
     {x:GRANDC.x,y:GRAND.y-28,e:'✦'},
   ];
   CHESTS.forEach(c=>M.push({x:c.x,y:c.y-36,e:({open:'🎁',day2:'🔒',day3:'🔒',grad:'🎓',gold:'👑',mystery:'❓'})[c.type]}));
@@ -1659,6 +1658,7 @@ function startGame(name,skin,gender='m'){
     cam.cx=LOBBY_SPAWN.x;cam.cy=LOBBY_SPAWN.y;
     $('game').classList.remove('mudmode');$('game').classList.add('entered');
     $('mudChip').style.display='none';$('hint').style.opacity=0;
+    sbSeen=true;   // no Stage B on the mobile map
     tut={phase:'move',t:0,cinema:false,startY:player.y};
     setTimeout(()=>setCap('MOVE YOUR THUMB UP&nbsp; ↑'),600);
   }
@@ -2017,7 +2017,7 @@ function update(dt){
   if(vipUnlocked)$('lockBanner').style.display='none';
 
   /* ---- Stage B (side stage): walk up to the rope → RSVP ---- */
-  const sb=entered&&player.x>SBZONE.x&&player.x<SBZONE.x+SBZONE.w&&player.y>SBZONE.y&&player.y<SBZONE.y+SBZONE.h;
+  const sb=!!SBZONE&&entered&&player.x>SBZONE.x&&player.x<SBZONE.x+SBZONE.w&&player.y>SBZONE.y&&player.y<SBZONE.y+SBZONE.h;
   if(sb&&!nearStageB){nearStageB=true;
     if(!stagebLatch){stagebLatch=true;proxOffer('🎪 STAGE B — SEE WHAT\'S ON',()=>{sbSeen=true;$('stagebModal').classList.add('show');},'sb');}}
   if(!sb&&nearStageB){nearStageB=false;stagebLatch=false;$('stagebModal').classList.remove('show');proxClear('sb');}
@@ -2241,7 +2241,7 @@ function render(){
           }
         });
       }
-      if(c.bubble)drawBubble(c);
+      if(c.bubble&&!IS_MOBILE)drawBubble(c);
     });
   }
 
@@ -2391,7 +2391,7 @@ function currentLights(){
   L.push({x:PM.x+PM.w/2,y:PM.y,r:180});
   // stage B (desktop room interior; mobile locked-door glow)
   if(ROOM.stageB){L.push({x:2050,y:560,r:190,warm:0.04});L.push({x:1862,y:640,r:110,warm:0.08});}
-  else L.push({x:SBZONE.x+18,y:SBZONE.y+50,r:110,warm:0.08});
+  else if(SBZONE)L.push({x:SBZONE.x+18,y:SBZONE.y+50,r:110,warm:0.08});
   return L;
 }
 function drawPuffs(){
@@ -2634,19 +2634,7 @@ function drawVipRoom(){
   if(vipUnlocked){ctx.font='700 13px "Montserrat"';ctx.fillStyle='#F9C85E';ctx.textAlign='center';ctx.fillText('★ APPLICANTS ONLY ★',vr.x+vr.w/2,vr.y+40);}
 }
 function drawStageB(){
-  if(!SB_PLAT){
-    // mobile: Stage B is a locked door on the Main Stage's east wall
-    const z=SBZONE, dx=z.x+z.w, dy=z.y+10, dh=z.h-20;
-    ctx.fillStyle='#F9C85E';ctx.fillRect(dx-6,dy,T,dh);
-    ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(dx-6,dy,5,dh);
-    const g=0.3+0.2*Math.sin(elapsed*2.2);
-    ctx.fillStyle=`rgba(249,200,94,${g*0.3})`;
-    ctx.beginPath();ctx.ellipse(dx-26,dy+dh/2,34,dh*0.55,0,0,Math.PI*2);ctx.fill();
-    ctx.font='15px "Lato"';ctx.fillStyle='#F9C85E';ctx.textAlign='center';
-    ctx.fillText('🔒',dx-24,dy+dh/2+5);
-    drawPill('STAGE B 🔒',z.x-52,z.y-16,true);
-    return;
-  }
+  if(!SB_PLAT)return;   // no Stage B on mobile
   const p=SB_PLAT;
   ctx.fillStyle='#141A12';ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,10);ctx.fill();
   ctx.fillStyle='#C9A24A';ctx.fillRect(p.x,p.y+p.h-6,p.w,5);
