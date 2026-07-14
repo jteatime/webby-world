@@ -315,16 +315,16 @@
   .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
   .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
   /* everything the player needs to SEE lives at the top on mobile */
-  #game.mobile #stageBar{position:fixed;left:0;right:0;top:auto;bottom:0;padding:14px 12px calc(18px + env(safe-area-inset-bottom,0px));gap:10px;
-    background:linear-gradient(180deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.95) 40%);transform:translateY(140%)}
+  #game.mobile #stageBar{position:fixed;left:0;right:0;top:auto;bottom:0;padding:22px 14px calc(26px + env(safe-area-inset-bottom,0px));gap:12px;flex-wrap:wrap;
+    background:linear-gradient(180deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.96) 32%);transform:translateY(140%)}
   #game.mobile #stageBar.show{transform:translateY(0)}
-  #game.mobile.stagebar #mobRail{bottom:calc(210px + env(safe-area-inset-bottom,0px))}
-  #game.mobile.stagebar #tapOpenBtn{top:auto;bottom:calc(112px + env(safe-area-inset-bottom,0px))}
-  #game.mobile #stageBar .sb-label{font-size:10.5px;letter-spacing:.14em}
-  #game.mobile #stageBar button{font-size:11px;padding:8px 11px}
+  #game.mobile.stagebar #mobRail{bottom:calc(250px + env(safe-area-inset-bottom,0px))}
+  #game.mobile.stagebar #tapOpenBtn{top:auto;bottom:calc(160px + env(safe-area-inset-bottom,0px))}
+  #game.mobile #stageBar .sb-label{width:100%;text-align:center;font-size:12.5px;letter-spacing:.2em}
+  #game.mobile #stageBar button{flex:1;font-size:15px;font-weight:800;padding:17px 10px;border-radius:15px}
   /* toasts read from the top on mobile — thumbs cover the bottom */
   #game.mobile #toast{top:auto;bottom:calc(176px + env(safe-area-inset-bottom,0px))}
-  #game.mobile #toast.raised{bottom:auto}
+  #game.mobile #toast.raised{top:auto;bottom:calc(250px + env(safe-area-inset-bottom,0px))}
   #game.mobile.mudmode #toast{top:auto;bottom:calc(176px + env(safe-area-inset-bottom,0px));font-size:14px;padding:12px 18px}
   #navSheet{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);color:#241E10;border-radius:22px 22px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .32s cubic-bezier(.3,1.2,.5,1);box-shadow:0 -18px 60px rgba(0,0,0,.5);max-height:72vh;overflow-y:auto}
   #navSheet.show{transform:translateY(0)}
@@ -1251,11 +1251,9 @@ function renderSort(){
     $('sortQ').textContent=player.archetype.emoji+' '+player.archetype.name;
     $('sortProg').textContent='Tell the room who you are:';
     box.innerHTML=
-      '<input class="p-input" id="bioBiz" placeholder="What\'s your business?" value="'+(player.profile.biz||'')+'">'+
-      '<input class="p-input" id="bioHope" placeholder="What are you hoping to get?" value="'+(player.profile.hope||'')+'">'+
       '<input class="p-input" id="bioBio" placeholder="Bio - tell us about you!" value="'+(player.profile.bio||'')+'">';
     const sv=document.createElement('button');sv.className='btn-cta';sv.textContent='Save my profile';
-    sv.onclick=()=>{player.profile={biz:$('bioBiz').value.trim(),hope:$('bioHope').value.trim(),bio:$('bioBio').value.trim()};
+    sv.onclick=()=>{player.profile.bio=$('bioBio').value.trim();
       sortStage=5;blip(1100,0.09,'sine',0.1);toast('✅ Profile saved — click any attendee to read theirs');renderSort();};
     box.appendChild(sv);
   }else{
@@ -1548,10 +1546,10 @@ function renderMobileMap(){
     if(inRoom(id,player.x,player.y)){
       const px=b.l+(player.x-room.x)/room.w*b.w, py=b.t+(player.y-room.y)/room.h*b.h;
       const dot=document.createElement('div');
-      dot.style.cssText=`position:absolute;left:${px}%;top:${py}%;width:11px;height:11px;border-radius:50%;background:#F9C85E;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(249,200,94,.3);z-index:2;pointer-events:none`;
+      dot.style.cssText=`position:absolute;left:${px}%;top:${py}%;width:16px;height:16px;border-radius:50%;background:#58B24A;border:2.5px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 5px rgba(88,178,74,.35);z-index:2;pointer-events:none`;
       wrap.appendChild(dot);
       const lbl=document.createElement('div');
-      lbl.style.cssText=`position:absolute;left:${px}%;top:${py+4.5}%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#F9C85E;letter-spacing:.06em;z-index:2;pointer-events:none`;
+      lbl.style.cssText=`position:absolute;left:${px}%;top:${py+5.5}%;transform:translateX(-50%);font-size:10px;font-weight:800;color:#7CCB5A;letter-spacing:.08em;z-index:2;pointer-events:none`;
       lbl.textContent='YOU';
       wrap.appendChild(lbl);
     }
@@ -1617,7 +1615,11 @@ function initMobileRail(){
   $('railMap').onclick=()=>{renderNav();$('navSheet').classList.add('show');blip(760,0.05,'sine',0.06);};
   $('railChat').onclick=()=>$('chatToggle').onclick();
   $('railHide').textContent=hideNpcs?'🙈':'👥';
-  $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';if(!tour)toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
+  $('railHide').onclick=()=>{
+    if(phase==='pitch'&&!applied&&!hideNpcs){toast('🔥 Everyone is rushing the desk — apply to hide the crowd',2800);return;}
+    hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';
+    if(!tour)toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);
+  };
   $('railProfile').onclick=()=>{const pc=$('profileCard');if(pc.classList.contains('show'))pc.classList.remove('show');else openProfile(player);};
   $('mobDemoBtn').onclick=()=>$('demoBtn').click();
 }
@@ -1765,7 +1767,7 @@ function startGameInputs(name){
       if(wx>QB.x-10&&wx<QB.x+QB.w+10&&wy>QB.y-10&&wy<QB.y+qbH+14){
         questCollapsed=!questCollapsed;blip(760,0.05,'sine',0.07);return;
       }
-      const hitChar=(hideNpcs?[player]:[...npcs,player]).find(c=>dist(wx,wy,c.x,c.y-14)<28);
+      const hitChar=((hideNpcs&&!(phase==='pitch'&&!applied))?[player]:[...npcs,player]).find(c=>dist(wx,wy,c.x,c.y-14)<28);
       if(hitChar){openProfile(hitChar);return;}
     }
     $('profileCard').classList.remove('show');
@@ -1941,9 +1943,9 @@ function update(dt){
     }else if(tut.phase==='panRoom'){
       if(tut.t>1.4){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},1.5);setCap('THIS IS THE MAIN STAGE');}
     }else if(tut.phase==='panStage'){
-      if(tut.t>2.4){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.1);hideCap();}
+      if(tut.t>1.6){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.1);hideCap();}
     }else if(tut.phase==='returnP'){
-      if(tut.t>1.3){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('START HERE —<br>WALK TO THE SORTING HAT');}
+      if(tut.t>1.3){tut.phase='hat';tut.t=0;tut.cinema=false;tut.from=null;setCap('<span style="display:block;color:#F7F3E3;font-size:12px;letter-spacing:.14em;margin-bottom:5px">START HERE</span>WALK TO THE SORTING HAT');}
     }else if(tut.phase==='hat'){
       if(dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62)){
         hideCap();tut=null;
@@ -2284,7 +2286,7 @@ function render(){
     if(tut)drawTutMask();
 
     drawPuffs();
-    (hideNpcs?[player]:[...npcs,player]).sort((a,b)=>a.y-b.y).forEach(c=>{
+    ((hideNpcs&&!(phase==='pitch'&&!applied))?[player]:[...npcs,player]).sort((a,b)=>a.y-b.y).forEach(c=>{
       const bob=(c.walkT===0)?Math.sin(elapsed*2.1+(c.x+c.y)*0.02)*1.2:0;
       if(c===player){
         const pr=0.5+0.5*Math.sin(elapsed*2.6);
