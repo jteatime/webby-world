@@ -266,7 +266,7 @@
   /* ---------- MOBILE: joystick + single ☰ menu + tap-to-open ---------- */
   #navToggle,#goBtn,#bonusChip{display:none}
   #game.entered #bonusChip{display:inline-block}
-  #bigClose{display:none;position:fixed;left:50%;transform:translateX(-50%);z-index:15;background:#C6362B;color:#fff;font-size:13.5px;font-weight:800;padding:11px 22px;border-radius:13px;border:2px solid #8E241C;box-shadow:0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
+  #bigClose{display:none;position:fixed;left:50%;transform:translateX(-50%);z-index:40;background:#C6362B;color:#fff;font-size:13.5px;font-weight:800;padding:11px 22px;border-radius:13px;border:2px solid #8E241C;box-shadow:0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
   #bigClose.on{display:block}
   #bigClose:active{transform:translateX(-50%) scale(.94)}
   #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:#569241;color:#fff;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #3B6D2A;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
@@ -422,6 +422,7 @@
     <button class="mm-row" id="mmGo"><span class="mm-e">📍</span>Go to…<span class="mm-sub">fast travel</span></button>
     <button class="mm-row" id="mmBonus"><span class="mm-e">🎁</span>Bonuses<span class="mm-sub" id="mmBonusSub">0/3</span></button>
     <button class="mm-row" id="mmChat"><span class="mm-e">💬</span>Chat</button>
+    <button class="mm-row" id="mmHide"><span class="mm-e">🙈</span><span id="mmHideTxt">Hide other attendees</span></button>
     <button class="mm-row" id="mmAmb"><span class="mm-e">🌊</span><span id="mmAmbTxt">Ocean sounds</span></button>
     <button class="mm-row" id="mmMute"><span class="mm-e">🔊</span><span id="mmMuteTxt">Sound on</span></button>
     <button class="mm-row" id="mmDemo" style="background:#C6362B;border-color:#C6362B;color:#fff"><span class="mm-e">▶</span><span id="mmDemoTxt">Demo: start the webinar</span></button>
@@ -996,7 +997,7 @@ let player,npcs=[],cam={cx:0,cy:0},zoom=1;
 let puffs=[];
 let keys={},tapTarget=null;
 /* ---------- mobile + device-bonus state ---------- */
-let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null;
+let navMode='walk',joyVec={x:0,y:0},ctxAction=null,tapHandler=null,hideNpcs=false;
 let tut=null;
 function setCap(html){const c=$('tutCap');c.innerHTML=html;c.classList.add('on');}
 function hideCap(){$('tutCap').classList.remove('on');}
@@ -1010,7 +1011,7 @@ function updateBigClose(){
   const el=$(openId);
   const host=el.classList.contains('modal-bg')?(el.firstElementChild||el):el;
   const rc=host.getBoundingClientRect();
-  btn.style.top=Math.min(rc.bottom-16,innerHeight-70)+'px';
+  btn.style.top=Math.min(rc.bottom+12,innerHeight-72)+'px';
   btn.classList.add('on');
 }
 let bonuses={entry:false,d1:false,d2:false};
@@ -1549,6 +1550,7 @@ function initMobileMenu(){
   $('mmGo').onclick=()=>{close();renderNav();$('navSheet').classList.add('show');};
   $('mmBonus').onclick=()=>{close();$('bonusChip').onclick();};
   $('mmChat').onclick=()=>{close();$('chatToggle').onclick();};
+  $('mmHide').onclick=()=>{hideNpcs=!hideNpcs;$('mmHideTxt').textContent=hideNpcs?'Show other attendees':'Hide other attendees';close();toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
   $('mmAmb').onclick=()=>{$('ambBtn').onclick();$('mmAmbTxt').textContent=$('ambBtn').textContent;};
   $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
   $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
@@ -1695,7 +1697,7 @@ function startGameInputs(name){
       if(wx>QB.x-10&&wx<QB.x+QB.w+10&&wy>QB.y-10&&wy<QB.y+qbH+14){
         questCollapsed=!questCollapsed;blip(760,0.05,'sine',0.07);return;
       }
-      const hitChar=[...npcs,player].find(c=>dist(wx,wy,c.x,c.y-14)<28);
+      const hitChar=(hideNpcs?[player]:[...npcs,player]).find(c=>dist(wx,wy,c.x,c.y-14)<28);
       if(hitChar){openProfile(hitChar);return;}
     }
     $('profileCard').classList.remove('show');
@@ -2204,7 +2206,7 @@ function render(){
     if(tut)drawTutMask();
 
     drawPuffs();
-    [...npcs,player].sort((a,b)=>a.y-b.y).forEach(c=>{
+    (hideNpcs?[player]:[...npcs,player]).sort((a,b)=>a.y-b.y).forEach(c=>{
       const bob=(c.walkT===0)?Math.sin(elapsed*2.1+(c.x+c.y)*0.02)*1.2:0;
       if(c===player){
         const pr=0.5+0.5*Math.sin(elapsed*2.6);
