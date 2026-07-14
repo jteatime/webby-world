@@ -187,6 +187,8 @@
   #game.mobile .panel p{font-size:12.5px}
   #game.mobile .panel .btn-cta{font-size:13.5px;padding:10px;margin-top:10px}
   #game.mobile .res-row{padding:8px 10px;margin-top:9px}
+  #game.mobile #chatPanel{left:0;right:0;bottom:0;width:auto;height:56vh;border-radius:20px 20px 0 0;border:none;border-top:2px solid #2E5A48;transform:translateY(105%);transform-origin:bottom center;z-index:34}
+  #game.mobile #chatPanel.show{transform:translateY(0)}
   .panel .p-eyebrow{font-family:var(--pixel);font-size:10px;letter-spacing:2px;color:#A0752B;margin-bottom:6px}
   .panel h3{font-family:var(--display);font-size:20px;line-height:1.15;margin-bottom:8px}
   .panel p{font-size:14px;line-height:1.5;color:#5B5340}
@@ -269,7 +271,7 @@
   #bigClose{display:none;position:fixed;left:50%;transform:translateX(-50%);z-index:40;background:#C6362B;color:#fff;font-size:13.5px;font-weight:800;padding:11px 22px;border-radius:13px;border:2px solid #8E241C;box-shadow:0 10px 26px rgba(0,0,0,.45);white-space:nowrap}
   #bigClose.on{display:block}
   #bigClose:active{transform:translateX(-50%) scale(.94)}
-  #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:#569241;color:#fff;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #3B6D2A;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
+  #tapOpenBtn{display:none;position:fixed;left:50%;top:calc(78% + 78px);transform:translateX(-50%);z-index:13;background:#C2551B;color:#fff;font-weight:800;font-size:15px;padding:14px 30px;border-radius:16px;border:2px solid #8F3D10;box-shadow:0 10px 28px rgba(0,0,0,.5);animation:ctxPulse 1.6s infinite;white-space:nowrap}
   #tapOpenBtn.on{display:block}
   #tapOpenBtn:active{transform:translateX(-50%) scale(.95)}
   @keyframes ctxPulse{0%,100%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 0 rgba(249,200,94,.4)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 12px rgba(249,200,94,0)}}
@@ -277,7 +279,7 @@
   #tutCap.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
-  #game.mobile.entered #joyWrap{display:block}
+  #game.mobile.tutorial #joyWrap{display:block}
   #joyWrap.live{transition:opacity .1s;opacity:1}
   #joyBase{width:112px;height:112px;border-radius:50%;background:rgba(8,26,20,.38);border:2px solid rgba(249,200,94,.30);position:relative}
   #joyKnob{width:48px;height:48px;border-radius:50%;background:rgba(249,200,94,.85);box-shadow:0 4px 14px rgba(0,0,0,.4);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transition:transform .22s cubic-bezier(.3,1.1,.5,1)}
@@ -288,8 +290,14 @@
   .ja-r{top:50%;right:9px;transform:translateY(-50%);border-right:0;border-left:9px solid rgba(249,200,94,.8)}
   #joyWrap.live #joyKnob{transition:none}
   /* single menu button — bottom-right; the whole bottom bar hides on mobile */
-  #mobMenuBtn{display:none;position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:12;width:46px;height:46px;border-radius:14px;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:20px;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
-  #game.mobile #mobMenuBtn{display:flex}
+  #mobMenuBtn{display:none}
+  #mobDemoBtn{display:none;position:fixed;right:12px;top:calc(10px + env(safe-area-inset-top,0px));z-index:12;height:40px;padding:0 13px;border-radius:12px;background:rgba(198,54,43,.92);border:2px solid #8E241C;color:#fff;font-size:12.5px;font-weight:800;align-items:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  #game.mobile #mobDemoBtn{display:flex}
+  #mobRail{display:none;position:fixed;right:10px;bottom:calc(150px + env(safe-area-inset-bottom,0px));z-index:12;flex-direction:column;gap:12px}
+  #game.mobile #mobRail{display:flex}
+  .rail-btn{width:50px;height:50px;border-radius:50%;background:rgba(8,26,20,.72);border:2px solid rgba(249,200,94,.5);color:var(--gold);font-size:21px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+  .rail-btn:active{transform:scale(.92)}
+  .rail-btn .rb-badge{position:absolute;top:-4px;right:-4px;background:#C6362B;color:#fff;font-size:10px;font-weight:800;border-radius:9px;padding:2px 6px;display:none}
   #game.mobile .hud-bottom{background:none;border:none;box-shadow:none;pointer-events:none}
   #game.mobile .hud-bottom .hud-btn{display:none!important}
   #game.mobile #attChip{display:none!important}
@@ -302,9 +310,11 @@
   .mm-row .mm-e{font-size:20px;flex:none;width:26px;text-align:center}
   .mm-row .mm-sub{margin-left:auto;font-weight:400;font-size:11.5px;color:#8A7E5F}
   /* everything the player needs to SEE lives at the top on mobile */
-  #game.mobile #stageBar{position:fixed;left:0;right:0;bottom:auto;top:calc(64px + env(safe-area-inset-top,0px));padding:10px 12px;gap:10px;
-    background:linear-gradient(0deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.94) 30%);transform:translateY(-160%)}
+  #game.mobile #stageBar{position:fixed;left:0;right:0;top:auto;bottom:0;padding:14px 12px calc(18px + env(safe-area-inset-bottom,0px));gap:10px;
+    background:linear-gradient(180deg,rgba(3,10,7,0) 0%,rgba(2,8,6,.95) 40%);transform:translateY(140%)}
   #game.mobile #stageBar.show{transform:translateY(0)}
+  #game.mobile.stagebar #mobRail{bottom:calc(210px + env(safe-area-inset-bottom,0px))}
+  #game.mobile.stagebar #tapOpenBtn{top:auto;bottom:calc(112px + env(safe-area-inset-bottom,0px))}
   #game.mobile #stageBar .sb-label{font-size:10.5px;letter-spacing:.14em}
   #game.mobile #stageBar button{font-size:11px;padding:8px 11px}
   /* toasts read from the top on mobile — thumbs cover the bottom */
@@ -409,24 +419,16 @@
   </div>
 
   <div id="joyWrap"><div id="joyBase"><span class="ja ja-u"></span><span class="ja ja-d"></span><span class="ja ja-l"></span><span class="ja ja-r"></span><div id="joyKnob"></div></div></div>
-  <button id="mobMenuBtn">☰</button>
+  <button id="mobDemoBtn">▶ Demo</button>
+  <div id="mobRail">
+    <button class="rail-btn" id="railMap" style="position:relative">🗺️</button>
+    <button class="rail-btn" id="railChat" style="position:relative">💬<span class="rb-badge" id="railChatBadge"></span></button>
+    <button class="rail-btn" id="railHide" style="position:relative">👥</button>
+  </div>
   <button id="bigClose">✕ &nbsp;Close this tab</button>
   <div id="tutCap"></div>
   <button id="tapOpenBtn">Tap to open</button>
 
-  <div id="mobMenu">
-    <div class="nav-head">
-      <div><div class="p-eyebrow">WEBBY WORLD</div><h3>Menu</h3></div>
-      <button id="mobMenuClose">✕</button>
-    </div>
-    <button class="mm-row" id="mmGo"><span class="mm-e">📍</span>Go to…<span class="mm-sub">fast travel</span></button>
-    <button class="mm-row" id="mmBonus"><span class="mm-e">🎁</span>Bonuses<span class="mm-sub" id="mmBonusSub">0/3</span></button>
-    <button class="mm-row" id="mmChat"><span class="mm-e">💬</span>Chat</button>
-    <button class="mm-row" id="mmHide"><span class="mm-e">🙈</span><span id="mmHideTxt">Hide other attendees</span></button>
-    <button class="mm-row" id="mmAmb"><span class="mm-e">🌊</span><span id="mmAmbTxt">Ocean sounds</span></button>
-    <button class="mm-row" id="mmMute"><span class="mm-e">🔊</span><span id="mmMuteTxt">Sound on</span></button>
-    <button class="mm-row" id="mmDemo" style="background:#C6362B;border-color:#C6362B;color:#fff"><span class="mm-e">▶</span><span id="mmDemoTxt">Demo: start the webinar</span></button>
-  </div>
 
   <div class="hud hud-bottom">
     <button class="hud-btn" id="demoBtn" style="background:#C6362B;border-color:#C6362B;color:#fff;font-weight:800">▶ Demo: start the webinar</button>
@@ -1170,7 +1172,7 @@ function postChat(c,text){
   box.appendChild(div);
   while(box.children.length>40)box.removeChild(box.firstChild);
   box.scrollTop=box.scrollHeight;
-  if(!chatOpen){chatUnread++;$('chatToggle').textContent='💬 Chat ('+chatUnread+')';}
+  if(!chatOpen){chatUnread++;$('chatToggle').textContent='💬 Chat ('+chatUnread+')';const rb=$('railChatBadge');rb.textContent=chatUnread;rb.style.display='block';}
 }
 function chatBurst(lines){
   lines.forEach((t,i)=>{const n=npcs[(Math.random()*npcs.length)|0];setTimeout(()=>postChat(n,t),i*900);});
@@ -1537,23 +1539,11 @@ function initFloatingStick(){
   };
   cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',e=>{if(e.pointerId===pid){pid=null;hide();}});
 }
-function initMobileMenu(){
-  const menu=$('mobMenu');
-  const close=()=>menu.classList.remove('show');
-  $('mobMenuBtn').onclick=()=>{
-    $('mmBonusSub').textContent=(bonuses.entry?1:0)+(bonuses.d1?1:0)+(bonuses.d2?1:0)+'/3';
-    $('mmDemoTxt').textContent=$('demoBtn').textContent.replace('▶ ','').replace('⏭ ','');
-    $('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';
-    menu.classList.add('show');
-  };
-  $('mobMenuClose').onclick=close;
-  $('mmGo').onclick=()=>{close();renderNav();$('navSheet').classList.add('show');};
-  $('mmBonus').onclick=()=>{close();$('bonusChip').onclick();};
-  $('mmChat').onclick=()=>{close();$('chatToggle').onclick();};
-  $('mmHide').onclick=()=>{hideNpcs=!hideNpcs;$('mmHideTxt').textContent=hideNpcs?'Show other attendees':'Hide other attendees';close();toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
-  $('mmAmb').onclick=()=>{$('ambBtn').onclick();$('mmAmbTxt').textContent=$('ambBtn').textContent;};
-  $('mmMute').onclick=()=>{$('muteBtn').onclick();$('mmMuteTxt').textContent=$('muteBtn').textContent==='🔊'?'Sound on':'Sound off';};
-  $('mmDemo').onclick=()=>{close();$('demoBtn').click();};
+function initMobileRail(){
+  $('railMap').onclick=()=>{renderNav();$('navSheet').classList.add('show');blip(760,0.05,'sine',0.06);};
+  $('railChat').onclick=()=>$('chatToggle').onclick();
+  $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
+  $('mobDemoBtn').onclick=()=>$('demoBtn').click();
 }
 /* during the tutorial, rooms you haven't been introduced to are blacked out */
 function drawTutMask(){
@@ -1629,6 +1619,7 @@ function drawMarkers(){
 let ctxAnchor=null,ctxOwner=null;
 function proxOffer(label,fn,key){
   if(!IS_MOBILE){fn();return;}
+  if(phase==='webinar')return;   // all actions blocked while the presentation plays
   ctxAction=fn;ctxOwner=key||null;
 }
 function proxClear(key){
@@ -1733,7 +1724,7 @@ function startGameInputs(name){
   $('profileClose').onclick=()=>$('profileCard').classList.remove('show');
   $('grandClose').onclick=()=>$('grandModal').classList.remove('show');
   $('chatToggle').onclick=()=>{chatOpen=!chatOpen;$('chatPanel').classList.toggle('show',chatOpen);
-    if(chatOpen){chatUnread=0;$('chatToggle').textContent='💬 Chat';const b=$('chatMsgs');b.scrollTop=b.scrollHeight;}};
+    if(chatOpen){chatUnread=0;$('chatToggle').textContent='💬 Chat';$('railChatBadge').style.display='none';const b=$('chatMsgs');b.scrollTop=b.scrollHeight;}};
   $('chatClose').onclick=()=>{chatOpen=false;$('chatPanel').classList.remove('show');};
   $('vidChatBtn').onclick=()=>$('chatToggle').onclick();
   $('vidVol').addEventListener('input',e=>{
@@ -1748,6 +1739,7 @@ function startGameInputs(name){
     const r=e.currentTarget.getBoundingClientRect();
     vid.currentTime=vid.duration*clamp((e.clientX-r.left)/r.width,0,1);
   });
+  if(IS_MOBILE)ambMode='off';
   $('ambBtn').onclick=()=>{ambMode=ambMode==='sea'?'off':'sea';$('ambBtn').textContent=ambMode==='sea'?'🌊 Ocean':'🔇 Ambience';toast(ambMode==='sea'?'🌊 Ambience: ocean waves':'🔇 Ambience off');};
   $('muteBtn').onclick=()=>{muted=!muted;if(masterG)masterG.gain.value=muted?0:0.9;applyVidAudio();$('muteBtn').textContent=muted?'🔇':'🔊';};
 
@@ -1755,7 +1747,8 @@ function startGameInputs(name){
   if(IS_MOBILE){
     $('game').classList.add('mobile');
     questCollapsed=true;
-    initMobileMenu();
+    initMobileRail();
+    $('game').classList.add('tutorial');
     $('bigClose').onclick=()=>{CLOSE_WATCH.forEach(id=>$(id).classList.remove('show'));blip(520,0.05,'sine',0.06);};
     $('tapOpenBtn').onclick=()=>{if(ctxAction)ctxAction();};
   }
@@ -1794,6 +1787,7 @@ function nextToast(){
 
 /* ---------- phases ---------- */
 function startWebinar(){
+  if(IS_MOBILE)proxClear();
   phase='webinar';countdownT=0;slideIdx=0;slideT=0;lockdown=true;webinarT=0;
   if(vid){vid.muted=true;vid.play().catch(()=>{});}
   $('countdown').style.display='none';$('liveTag').style.display='inline';
@@ -1870,6 +1864,7 @@ function update(dt){
     }else if(tut.phase==='hat'){
       if(dist(player.x,player.y,HAT_OBJ.x,HAT_OBJ.y)<(IS_MOBILE?84:62)){
         hideCap();tut=null;
+        $('game').classList.remove('tutorial');
         spawnNpcs();
         onEventEntered();
         toast('🌿 The lobby fills in around you — welcome to Webby World',3600);
