@@ -279,6 +279,9 @@
   #tutCap.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
   #tutCap.low{top:58%}
   .rail-btn.pulse{border-color:#F9C85E;animation:ctxPulse 1.6s infinite}
+  #tourTip{display:none;position:fixed;z-index:17;background:rgba(6,14,10,.94);border:1.5px solid rgba(249,200,94,.6);border-radius:12px;padding:9px 13px;color:#F7F3E3;font-weight:700;font-size:12.5px;max-width:170px;line-height:1.35;transform:translateY(-50%);box-shadow:0 8px 26px rgba(0,0,0,.5);pointer-events:none}
+  #tourTip.on{display:block}
+  #tourTip::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);border:8px solid transparent;border-right:0;border-left:9px solid rgba(6,14,10,.94)}
   /* joystick — rests ghosted at centre-low; jumps under the thumb on touch, floats home on release */
   #joyWrap{position:fixed;left:50%;top:78%;z-index:12;display:none;transform:translate(-50%,-50%);pointer-events:none;transition:left .28s cubic-bezier(.3,1.1,.5,1),top .28s cubic-bezier(.3,1.1,.5,1),opacity .25s;opacity:.4}
   #game.mobile.tutorial #joyWrap{display:block}
@@ -430,6 +433,7 @@
   </div>
   <button id="bigClose">✕ &nbsp;Close this tab</button>
   <div id="tutCap"></div>
+  <div id="tourTip"></div>
   <button id="tapOpenBtn">Tap to open</button>
 
 
@@ -1007,10 +1011,15 @@ let tut=null,tour=null;
 function setCap(html,low){const c=$('tutCap');c.innerHTML=html;c.classList.add('on');c.classList.toggle('low',!!low);}
 function tourStep(){
   ['railMap','railChat','railHide'].forEach(id=>$(id).classList.remove('pulse'));
-  if(!tour)return;
-  if(tour.step==='map'){setCap('🗺️ THIS IS THE MAP —<br>TAP IT, THEN CLOSE IT',true);$('railMap').classList.add('pulse');}
-  else if(tour.step==='chat'){setCap('💬 THIS IS THE LIVE CHAT —<br>OPEN IT, THEN CLOSE IT',true);$('railChat').classList.add('pulse');}
-  else if(tour.step==='hide'){setCap('👥 NOW TAP TO REVEAL<br>THE OTHER ATTENDEES',true);$('railHide').classList.add('pulse');}
+  const tip=$('tourTip');
+  if(!tour){tip.classList.remove('on');return;}
+  const cfg={map:['railMap','Click to open the map'],chat:['railChat','Click to open chat'],hide:['railHide','Click to show attendees']}[tour.step];
+  const btn=$(cfg[0]);btn.classList.add('pulse');
+  const r=btn.getBoundingClientRect();
+  tip.textContent=cfg[1];
+  tip.style.top=(r.top+r.height/2)+'px';
+  tip.style.right=(innerWidth-r.left+12)+'px';
+  tip.classList.add('on');
 }
 function tourUpdate(){
   if(!tour)return;
@@ -1022,11 +1031,11 @@ function tourUpdate(){
     if(chatOpen)tour.opened=true;
     if(tour.opened&&!chatOpen){tour={step:'hide'};tourStep();}
   }else if(tour.step==='hide'){
-    if(!hideNpcs){tour=null;tourStep();hideCap();toast('🌿 Welcome to Webby World — enjoy the event',3200);}
+    if(!hideNpcs){tour=null;tourStep();toast('🌿 Welcome to Webby World — enjoy the event',3200);}
   }
 }
 function hideCap(){$('tutCap').classList.remove('on');}
-const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','profileCard','hofCard','bonusPanel'];
+const CLOSE_WATCH=['resourcePanel','goldenPanel','mysteryPanel','lockedPanel','sortPanel','calendarPanel','leaderPanel','closetPanel','quizPanel','applyPanel','grandModal','stagebModal','hofCard','bonusPanel'];
 function updateBigClose(){
   if(!IS_MOBILE)return;
   $('tapOpenBtn').classList.toggle('on',!!ctxAction&&!CLOSE_WATCH.some(id=>$(id).classList.contains('show')));
@@ -1468,7 +1477,6 @@ function onEventEntered(){
         setTimeout(()=>{burstConfetti(player.x,player.y-26,72);sfxPop();
           toast('🖥️ DESKTOP BONUSES UNLOCKED — 2 more gifts in the 🎁 chip',5000);},2100);}
     }else{
-      setTimeout(()=>toast('🖥️ 2 more bonuses are waiting on desktop — log in on your computer to unlock them',5400),2400);
     }
   },1500);
 }
@@ -1497,6 +1505,7 @@ const NAV_DESTS=IS_MOBILE?[
   {e:'👑',name:'VIP Lounge',sub:'Applicants only',x:840,y:326,vip:true},
 ];
 function renderNav(){
+  if(IS_MOBILE){renderMobileMap();return;}
   const grid=$('navGrid');grid.innerHTML='';
   NAV_DESTS.forEach(d=>{
     const locked=d.vip&&!vipUnlocked;
@@ -1506,6 +1515,48 @@ function renderNav(){
     b.onclick=()=>teleportTo(d);
     grid.appendChild(b);
   });
+}
+/* mobile fast travel: a schematic map of the rooms (rooms only — no props) */
+function renderMobileMap(){
+  const grid=$('navGrid');grid.innerHTML='';
+  grid.style.display='block';
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;height:352px;background:#10160F;border-radius:14px;border:1px solid #2C3020;overflow:hidden';
+  const spots={mainStage:{x:240,y:1000},lobby:{x:240,y:1950},hof:{x:240,y:2260},treasure:{x:645,y:1100},vip:{x:640,y:830}};
+  const boxes={
+    vip:      {l:53,t:3, w:43,h:19, e:'👑',col:'#0D3A33'},
+    treasure: {l:53,t:26,w:43,h:21, e:'💰',col:'#57482E'},
+    mainStage:{l:4, t:26,w:44,h:21, e:'🎤',col:'#1E2A18'},
+    lobby:    {l:4, t:51,w:44,h:21, e:'🌿',col:'#4E523A'},
+    hof:      {l:4, t:76,w:44,h:19, e:'🏆',col:'#33402E'},
+  };
+  // corridors
+  [['4px','72%','44%','2px','24%'],['4px','48.5%','44%','2px','25%']].forEach(()=>{});
+  const cor=(l,t,w,h)=>{const c=document.createElement('div');c.style.cssText=`position:absolute;left:${l};top:${t};width:${w};height:${h};background:rgba(249,200,94,.35)`;wrap.appendChild(c);};
+  cor('25%','47%','2.5%','4%');   // stage ⇄ lobby
+  cor('25%','72%','2.5%','4%');   // lobby ⇄ hof
+  cor('48%','35%','5%','3%');     // stage ⇄ treasure
+  cor('73%','22%','2.5%','4%');   // treasure ⇄ vip
+  Object.entries(boxes).forEach(([id,b])=>{
+    const room=ROOM[id];
+    const locked=id==='vip'&&!vipUnlocked;
+    const d=document.createElement('button');
+    d.style.cssText=`position:absolute;left:${b.l}%;top:${b.t}%;width:${b.w}%;height:${b.h}%;background:${b.col};border:1.5px solid ${locked?'#6b5a2a':'rgba(249,200,94,.55)'};border-radius:10px;color:#F7F3E3;font-weight:800;font-size:11px;letter-spacing:.04em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;${locked?'opacity:.55':''}`;
+    d.innerHTML=`<span style="font-size:17px">${locked?'🔒':b.e}</span>${room.name.toUpperCase()}`;
+    d.onclick=()=>teleportTo({e:b.e,name:room.name,x:spots[id].x,y:spots[id].y,vip:id==='vip'});
+    wrap.appendChild(d);
+    if(inRoom(id,player.x,player.y)){
+      const px=b.l+(player.x-room.x)/room.w*b.w, py=b.t+(player.y-room.y)/room.h*b.h;
+      const dot=document.createElement('div');
+      dot.style.cssText=`position:absolute;left:${px}%;top:${py}%;width:11px;height:11px;border-radius:50%;background:#F9C85E;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(249,200,94,.3);z-index:2;pointer-events:none`;
+      wrap.appendChild(dot);
+      const lbl=document.createElement('div');
+      lbl.style.cssText=`position:absolute;left:${px}%;top:${py+4.5}%;transform:translateX(-50%);font-size:9px;font-weight:800;color:#F9C85E;letter-spacing:.06em;z-index:2;pointer-events:none`;
+      lbl.textContent='YOU';
+      wrap.appendChild(lbl);
+    }
+  });
+  grid.appendChild(wrap);
 }
 function teleportTo(d){
   if(tut){toast('🧭 Finish the orientation first — walk to the sorting hat',2600);return;}
@@ -1567,7 +1618,7 @@ function initMobileRail(){
   $('railChat').onclick=()=>$('chatToggle').onclick();
   $('railHide').textContent=hideNpcs?'🙈':'👥';
   $('railHide').onclick=()=>{hideNpcs=!hideNpcs;$('railHide').textContent=hideNpcs?'🙈':'👥';if(!tour)toast(hideNpcs?'🙈 Other attendees hidden — just you and the world':'👥 Attendees are back',2400);};
-  $('railProfile').onclick=()=>openProfile(player);
+  $('railProfile').onclick=()=>{const pc=$('profileCard');if(pc.classList.contains('show'))pc.classList.remove('show');else openProfile(player);};
   $('mobDemoBtn').onclick=()=>$('demoBtn').click();
 }
 /* during the tutorial, rooms you haven't been introduced to are blacked out */
@@ -1888,7 +1939,7 @@ function update(dt){
         setCap('THIS IS THE MAIN ROOM');sfxChime&&sfxChime();
       }
     }else if(tut.phase==='panRoom'){
-      if(tut.t>2.0){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},1.5);setCap('THIS IS THE MAIN STAGE');}
+      if(tut.t>1.4){tut.phase='panStage';tut.t=0;pan({x:240,y:1010},1.5);setCap('THIS IS THE MAIN STAGE');}
     }else if(tut.phase==='panStage'){
       if(tut.t>2.4){tut.phase='returnP';tut.t=0;pan({x:player.x,y:player.y},1.1);hideCap();}
     }else if(tut.phase==='returnP'){
@@ -1899,7 +1950,7 @@ function update(dt){
         $('game').classList.remove('tutorial');
         spawnNpcs();               // spawned, but hidden until the tour's reveal
         onEventEntered();
-        tour={step:'map',opened:false};tourStep();
+        tour={step:'map',opened:false};tourStep();hideCap();
       }
     }
   }
